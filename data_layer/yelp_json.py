@@ -6,7 +6,6 @@
 import json
 import urllib
 import urllib2
-
 import oauth2
 
 API_HOST = 'api.yelp.com'
@@ -35,13 +34,7 @@ class YelpApiDataExtractor:
             print('No businesses for {0} in {1} found.'.format(term, location))
             return
 
-        results = []
-
-        for i in range(0, search_limit):
-            print i
-            results.append(self.__get_business(businesses[i]['id']))
-
-        return results
+        return businesses
 
     def __search(self, term, location, search_limit):
         """
@@ -57,13 +50,6 @@ class YelpApiDataExtractor:
         }
 
         return self.__request(API_HOST, SEARCH_PATH, url_params=url_params)
-
-    def __get_business(self, business_id):
-        """
-
-        """
-        business_path = '/v2/business/'+business_id
-        return self.__request('api.yelp.com', business_path)
 
     def __request(self, host, path, url_params=None):
         """
