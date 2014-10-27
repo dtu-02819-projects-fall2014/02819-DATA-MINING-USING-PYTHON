@@ -9,6 +9,7 @@ import urllib2
 import oauth2
 
 API_HOST = 'api.yelp.com'
+SEARCH_PATH = '/v2/search/'
 
 
 class YelpApiDataExtractor:
@@ -40,8 +41,6 @@ class YelpApiDataExtractor:
         """
 
         """
-        API_HOST = 'api.yelp.com'
-        SEARCH_PATH = '/v2/search/'
 
         url_params = {
             'term': term,
