@@ -11,7 +11,6 @@ import oauth2
 API_HOST = 'api.yelp.com'
 SEARCH_PATH = '/v2/search/'
 
-
 class YelpApiDataExtractor:
     """
 
