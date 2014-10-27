@@ -10,7 +10,6 @@ import oauth2
 
 API_HOST = 'api.yelp.com'
 
-
 class YelpApiDataExtractor:
     """
 
