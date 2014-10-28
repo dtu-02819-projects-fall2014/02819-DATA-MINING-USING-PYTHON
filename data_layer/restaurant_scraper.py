@@ -20,6 +20,7 @@ def scrap_users(url):
     for page in xrange(page_interval):
         content = urllib2.urlopen(next(url, page)).read()
         soup = BeautifulSoup(content)
+
         for user in soup.find_all('a', class_='user-display-name'):
             user_hash = user.get('href').split('=')[1]
             user_name = user.get_text('data-hovercard-id')
