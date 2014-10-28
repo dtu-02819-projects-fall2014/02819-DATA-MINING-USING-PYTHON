@@ -21,7 +21,7 @@ def sleep_rand():
       sleep(a)
 
 def get_user(user_id,length=140):
-    
+
     page_start=0
     reviews=[]
 
@@ -50,18 +50,18 @@ def get_user(user_id,length=140):
             break
         page_start+=10
         sleep_rand()
- 
+
     print 'getting user informations..'
     user={}
     user['id']=user_id
-    user['reviews_count']=len(reviews)    
+    user['reviews_count']=len(reviews)
     user['reviews']=reviews
 
     rep={'\n':'','\'s Profile':''}
     user['name']= replace_all(soup.find('div',class_='about-connections').find('h1').get_text(),rep).strip()
 
     s=soup.find('div',id='about_user_column')
-    
+
     user['location']=s.find('div',id='profile_questions').find_all('p')[0].get_text().replace('\n','').strip()
     user['created_at']=s.find('div',id='profile_questions').find_all('p')[1].get_text().replace('\n','').strip()
 
@@ -74,7 +74,7 @@ def get_user(user_id,length=140):
     else:
         rv['useful'],rv['funny'],rv['cool'],rv['total']=0
     user['review_votes']=rv
-    
+
     soup2=soup_friends(user_id)
     friends=[]
     for f in soup2.find_all('div',class_='friend_box'):
@@ -85,7 +85,7 @@ def get_user(user_id,length=140):
         friends.append(friend)
     user['friends']=friends
     user['friends_count']=len(friends)
-    
+
     return user
 
 

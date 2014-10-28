@@ -1,2 +1,4 @@
-data_layer/.DS_Store
-data_layer/.ipynb_checkpoints
+**/.DS_Store
+**/.ipynb_checkpoints
+**.ipynb
+**.pyc
