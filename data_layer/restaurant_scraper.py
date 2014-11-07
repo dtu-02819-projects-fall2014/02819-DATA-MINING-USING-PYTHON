@@ -4,7 +4,6 @@
 
 """
 
-from __future__ import print_function
 import urllib2
 from bs4 import BeautifulSoup
 
@@ -44,7 +43,7 @@ def next(base_url, next_page, num):
     return ''.join([base_url, '?start=', str(next_page*num)])
 
 
-def construct_mongotable(dictionary):
+def construct_user_mongotable(dictionary):
     """
 
     """
