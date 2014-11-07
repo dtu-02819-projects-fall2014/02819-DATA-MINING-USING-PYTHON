@@ -54,13 +54,8 @@ def next(base_url, next_page, num):
     return ''.join([base_url, '?start=', str(next_page*num)])
 
 
-<<<<<<< HEAD
-def construct_user_mongotable(dictionary):
-=======
-
 #Not needed
 def construct_mongotable(dictionary):
->>>>>>> 3e7473faf76d3964dbd9fc58ffc27c187676ab33
     """
 
     """
