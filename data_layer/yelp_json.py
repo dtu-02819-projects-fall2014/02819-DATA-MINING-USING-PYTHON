@@ -8,13 +8,13 @@ import urllib
 import urllib2
 import oauth2
 
-API_HOST = 'api.yelp.com'
-SEARCH_PATH = '/v2/search/'
 
 class YelpApiDataExtractor:
     """
 
     """
+    API_HOST = 'api.yelp.com'
+    SEARCH_PATH = '/v2/search/'
 
     def __init__(self, consumer_key, consumer_secret, token, token_secret):
         self.consumer_key = consumer_key
@@ -47,7 +47,8 @@ class YelpApiDataExtractor:
             'limit': search_limit
         }
 
-        return self.__request(API_HOST, SEARCH_PATH, url_params=url_params)
+        return self.__request(self.API_HOST, self.SEARCH_PATH,
+                              url_params=url_params)
 
     def __request(self, host, path, url_params=None):
         """
@@ -58,7 +59,22 @@ class YelpApiDataExtractor:
 
         url = 'http://{0}{1}?{2}'.format(host, path, encoded_params)
 
+        signed_url = self.__oatuh(url)
+
+        connection = urllib2.urlopen(signed_url, None)
+        try:
+            response = json.loads(connection.read())
+        finally:
+            connection.close()
+
+        return response
+
+    def __oatuh(self, url):
+        """
+
+        """
         consumer = oauth2.Consumer(self.consumer_key, self.consumer_secret)
+
         oauth_request = oauth2.Request('GET', url, {})
         oauth_request.update(
             {
@@ -73,10 +89,4 @@ class YelpApiDataExtractor:
                                    oauth_token)
         signed_url = oauth_request.to_url()
 
-        connection = urllib2.urlopen(signed_url, None)
-        try:
-            response = json.loads(connection.read())
-        finally:
-            connection.close()
-
-        return response
+        return signed_url
