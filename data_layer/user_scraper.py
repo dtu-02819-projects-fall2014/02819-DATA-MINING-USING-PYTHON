@@ -58,8 +58,6 @@ def extract_restaurant_address(soup_snippet):
     """
     bs4.element.Tag
     """
-    name = soup_snippet.find('a', class_='biz-name').get_text()
-
     soup_snippet_string = str(soup_snippet.find('address'))
 
     # Deals with all the first addr lines in address string,
@@ -70,7 +68,16 @@ def extract_restaurant_address(soup_snippet):
                                      '<address>': ''}
                                     ).strip().split(',')[:-1]
 
-    return_address_list = [name]
-    return_address_list.extend(cleaned_addr_list)
+    return {'address': ' '.join(item for item in cleaned_addr_list)}
 
-    return return_address_list
+
+def extract_restaurant_id_and_name(soup_snippet):
+    """
+
+    """
+    hash_value = soup_snippet.find(
+        'a', class_="biz-name").get('data-hovercard-id')
+
+    name = soup_snippet.find('a', class_='biz-name').get_text()
+
+    return {'_id': hash_value, 'name': name}
