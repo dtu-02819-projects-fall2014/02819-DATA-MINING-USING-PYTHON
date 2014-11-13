@@ -5,13 +5,6 @@ import re
 from time import sleep
 from random import uniform
 
-from pymongo import MongoClient
-
-client = MongoClient('localhost', 27017)
-db = client.yelp_db
-users_info = db.user_info
-places = db.places
-
 
 def soup_reviews(user_id, page_start):
     url = 'http://www.yelp.com/user_details_reviews_self?userid=%s\
@@ -34,10 +27,6 @@ def sleep_rand():
 
 
 def get_user(user_id, length=100, city=u'k\xf8benhavn'):
-
-    if users_info.find({'_id': user_id}).count() is not 0:
-        print "user already in db"
-        return
 
     # Getting the reviews
 
@@ -90,9 +79,6 @@ def get_user(user_id, length=100, city=u'k\xf8benhavn'):
                     r['text'] = r['text'][:length] + '...'
                 reviews.append(r)
 
-                places.insert(p)
-                print p['name'], 'inserted in places db'
-
         sleep_rand()
         if len(soup.find_all('td', class_='nav-links')) < 2:
             break
@@ -133,9 +119,6 @@ def get_user(user_id, length=100, city=u'k\xf8benhavn'):
     else:
         rv['useful'], rv['funny'], rv['cool'], rv['total'] = 0
     user['review_votes'] = rv
-
-    users_info.insert(user)
-    print user['name'], 'inserted in users_info db'
 
     return user
 
