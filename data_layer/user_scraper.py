@@ -14,8 +14,8 @@ places = db.places
 
 
 def soup_reviews(user_id, page_start):
-    url = 'http://www.yelp.com/user_details_reviews_self?userid=%s\
-        &rec_pagestart=%d' % (user_id, page_start)
+    url = 'http://www.yelp.com/user_details_reviews_self?userid=%s'\
+        '&rec_pagestart=%d' % (user_id, page_start)
     content = urllib2.urlopen(url).read()
     return BeautifulSoup(content)
 
