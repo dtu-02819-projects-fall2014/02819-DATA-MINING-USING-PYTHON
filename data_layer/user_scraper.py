@@ -41,9 +41,16 @@ def scrap_reviews(user_id, city, length=100):
             soup = soup_reviews(user_id, page*10)
 
         for review in soup.find_all('div', class_='review'):
-            address = extract_restaurant_address(review)
-            if 'K\xc3\xb8benhavn' in address[-1]:
-                restaurants.append(address)
+            address = extract_address(review)
+            if city in address['address']:
+                id_name = extract_id_and_name(review)
+                price_category = extract_price_and_category(review)
+                merge_dicts = reduce(lambda d1, d2: dict(d1, **d2),
+                                     (id_name,
+                                      address,
+                                      price_category))
+
+                restaurants.append(merge_dicts)
 
     return restaurants
 
@@ -54,7 +61,7 @@ def replace_all(text, dic):
     return text
 
 
-def extract_restaurant_address(soup_snippet):
+def extract_address(soup_snippet):
     """
     bs4.element.Tag
     """
@@ -68,10 +75,11 @@ def extract_restaurant_address(soup_snippet):
                                      '<address>': ''}
                                     ).strip().split(',')[:-1]
 
-    return {'address': ' '.join(item for item in cleaned_addr_list)}
+    return {'address': ' '.join(
+        item.decode('utf-8') for item in cleaned_addr_list)}
 
 
-def extract_restaurant_id_and_name(soup_snippet):
+def extract_id_and_name(soup_snippet):
     """
 
     """
@@ -81,3 +89,26 @@ def extract_restaurant_id_and_name(soup_snippet):
     name = soup_snippet.find('a', class_='biz-name').get_text()
 
     return {'_id': hash_value, 'name': name}
+
+
+def extract_price_and_category(soup_snippet):
+    """
+
+    """
+    price_category_list = soup_snippet.find(
+        'div', class_='price-category').get_text().split('\n')
+
+    # clean up the list
+    price_category_list = [i for i in price_category_list if i is not u'']
+    category_index = 0 if len(price_category_list) is 1 else 1
+    price_category_list[category_index] = [
+        i.strip() for i in price_category_list[category_index].split(',')]
+
+    # translate the yelp price symbol into a integer, if price exists
+    if category_index > 0:
+        price_category_list[0] = len(price_category_list[0])
+
+        return {'price': price_category_list[0],
+                'categories': price_category_list[category_index]}
+
+    return {'categories': price_category_list[category_index]}
