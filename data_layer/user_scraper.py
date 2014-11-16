@@ -25,16 +25,56 @@ def sleep_rand():
     sleep(a)
 
 
-def scrap_reviews(user_id, city, length=100):
+def put_it(user_id, city):
     """
 
     """
-    restaurants = []
+    places = []
 
     soup = soup_reviews(user_id, 0)
 
-    page_interval = int(soup.find(
-        'td', class_='range-of-total').get_text().strip().split(' ')[-1])/10
+    page_interval = get_number_of_pages(soup)
+
+    for page in xrange(page_interval):
+        if page is not 0:
+            soup = soup_reviews(user_id, page_interval*10)
+
+        places.extend(scrap_users_places(soup, city))
+
+    return places
+
+
+def scrap_users_places(soup, city):
+    """
+
+    """
+    places = []
+
+    for review in soup.find_all('div', class_='review'):
+        address = extract_address(review)
+        if city in address['address']:
+            id_name = extract_id_and_name(review)
+            price_category = extract_price_and_category(review)
+
+            merge_dicts = reduce(lambda d1, d2: dict(d1, **d2),
+                                 (id_name,
+                                  address,
+                                  price_category))
+
+            places.append(merge_dicts)
+
+    return places
+
+
+def scrap_users_places_2(user_id, city):
+    """
+
+    """
+    places = []
+
+    soup = soup_reviews(user_id, 0)
+
+    page_interval = get_number_of_pages(soup)
 
     for page in xrange(page_interval):
         if page is not 0:
@@ -45,14 +85,23 @@ def scrap_reviews(user_id, city, length=100):
             if city in address['address']:
                 id_name = extract_id_and_name(review)
                 price_category = extract_price_and_category(review)
+
                 merge_dicts = reduce(lambda d1, d2: dict(d1, **d2),
                                      (id_name,
                                       address,
                                       price_category))
 
-                restaurants.append(merge_dicts)
+                places.append(merge_dicts)
 
-    return restaurants
+    return places
+
+
+def get_number_of_pages(soup_snippet):
+    """
+
+    """
+    return int(soup_snippet.find(
+        'td', class_='range-of-total').get_text().strip().split(' ')[-1])
 
 
 def replace_all(text, dic):
@@ -112,3 +161,19 @@ def extract_price_and_category(soup_snippet):
                 'categories': price_category_list[category_index]}
 
     return {'categories': price_category_list[category_index]}
+
+
+def extract_rating(soup_snippet, review_length=100):
+    """
+
+    """
+    rating = float(soup_snippet.find('div', class_='rating-very-large').find(
+        'i').get('title').split(' ')[0])
+
+    rating_date = soup_snippet.find(
+        'span', class_='rating-qualifier').get_text().strip()
+
+    rating_text = soup_snippet.find(
+        'div', class_='review-content').find('p').get_text()[:review_length]
+
+    return {'rating': rating, 'created_at': rating_date, 'text': rating_text}
