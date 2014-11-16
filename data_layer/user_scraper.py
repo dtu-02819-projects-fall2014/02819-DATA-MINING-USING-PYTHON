@@ -1,179 +1,170 @@
 # -*- coding: utf-8 -*-
 import urllib2
 from bs4 import BeautifulSoup
-from time import sleep
-from random import uniform
 
 
-def soup_reviews(user_id, page_start):
-    url = 'http://www.yelp.com/user_details_reviews_self?userid=%s'\
-        '&rec_pagestart=%d' % (user_id, page_start)
-    content = urllib2.urlopen(url).read()
-    return BeautifulSoup(content)
+class UserScraper:
 
+    def __init__(self):
+        self.places = []
+        self.users = []
+        self.soups = {}
+        self.soups_city = {}
 
-def soup_friends(user_id):
-    friends_url = 'http://www.yelp.com/user_details_friends?userid=%s'\
-        % (user_id)
-    content = urllib2.urlopen(friends_url).read()
-    return BeautifulSoup(content)
+    def soup_reviews(self, user_id, page_start):
+        url = 'http://www.yelp.com/user_details_reviews_self?userid=%s'\
+            '&rec_pagestart=%d' % (user_id, page_start)
+        content = urllib2.urlopen(url).read()
+        return BeautifulSoup(content)
 
+    def soup_friends(self, user_id):
+        friends_url = 'http://www.yelp.com/user_details_friends?userid=%s'\
+            % (user_id)
+        content = urllib2.urlopen(friends_url).read()
+        return BeautifulSoup(content)
 
-def sleep_rand():
-    a = uniform(0.1, 0.5)
-    print "sleeping %.2f seconds" % (a)
-    sleep(a)
+    def put_it(self, user_id, city):
+        """
 
+        """
+        include_last_page = 1
+        soup = self.soup_reviews(user_id, 0)
+        pages = [soup]
 
-def put_it(user_id, city):
-    """
+        # partition page_interval in tens
+        page_interval = self.get_number_of_pages(soup)/10
 
-    """
-    places = []
+        for page in xrange(page_interval+include_last_page):
+            if page is not 0:
+                soup = self.soup_reviews(user_id, page*10)
+                pages.append(soup)
 
-    soup = soup_reviews(user_id, 0)
+        self.soups[user_id] = pages
+        self.soups_city[user_id] = []
 
-    page_interval = get_number_of_pages(soup)
+    def scrap_users_places(self, city):
+        """
 
-    for page in xrange(page_interval):
-        if page is not 0:
-            soup = soup_reviews(user_id, page_interval*10)
+        """
+        for user, soups in self.soups.items():
+            for soup in soups:
+                for review in soup.find_all('div', class_='review'):
+                    address = self.extract_address(review)
+                    if city in address['address']:
+                        self.soups_city[user].append(review)
+                        id_name = self.extract_id_and_name(review)
+                        price_category = self.extract_price_and_category(review)
 
-        places.extend(scrap_users_places(soup, city))
+                        merge_dicts = reduce(lambda d1, d2: dict(d1, **d2),
+                                             (id_name, address, price_category))
 
-    return places
+                        self.places.append(merge_dicts)
 
+    def scrap_users_reviews(self):
+        """
 
-def scrap_users_places(soup, city):
-    """
+        """
+        for user, reviews in self.soups_city.items():
+            user_reviews = []
+            user_info = self.extract_user_information(user)
 
-    """
-    places = []
+            for review in reviews:
+                id_name = self.extract_id_and_name(review)
+                rating_review = self.extract_rating(review)
+                merge_dicts = dict(id_name.items() + rating_review.items())
+                user_reviews.append(merge_dicts)
 
-    for review in soup.find_all('div', class_='review'):
-        address = extract_address(review)
-        if city in address['address']:
-            id_name = extract_id_and_name(review)
-            price_category = extract_price_and_category(review)
+            self.users.append({'_id': user,
+                               'location': user_info['location'],
+                               'created_at': user_info['created_at'],
+                               'reviews': user_reviews})
 
-            merge_dicts = reduce(lambda d1, d2: dict(d1, **d2),
-                                 (id_name,
-                                  address,
-                                  price_category))
+    def extract_user_information(self, user_id):
+        location = self.soups[user_id][0].find(
+            'div', id='profile_questions').find_all('p')[0].get_text(
+            ).replace('\n', '').strip()
 
-            places.append(merge_dicts)
+        creates_at = self.soups[user_id][0].find(
+            'div', id='profile_questions').find_all(
+                'p')[1].get_text().replace('\n', '').strip()
 
-    return places
+        return {'location': location, 'created_at': creates_at}
 
+    def get_number_of_pages(self, soup_snippet):
+        """
 
-def scrap_users_places_2(user_id, city):
-    """
+        """
+        return int(soup_snippet.find(
+            'td', class_='range-of-total').get_text().strip().split(' ')[-1])
 
-    """
-    places = []
+    def replace_all(self, text, dic):
+        for i, j in dic.iteritems():
+            text = text.replace(i, j)
+        return text
 
-    soup = soup_reviews(user_id, 0)
+    def extract_address(self, soup_snippet):
+        """
+        bs4.element.Tag
+        """
+        soup_snippet_string = str(soup_snippet.find('address'))
 
-    page_interval = get_number_of_pages(soup)
+        # Deals with all the first addr lines in address string,
+        # last address line is a special case
+        cleaned_addr_list = self.replace_all(
+            soup_snippet_string, {'\n': '',
+                                  '<br>': ',',
+                                  '<address>': ''}).strip().split(',')[:-1]
 
-    for page in xrange(page_interval):
-        if page is not 0:
-            soup = soup_reviews(user_id, page*10)
+        return {'address': ' '.join(
+            item.decode('utf-8') for item in cleaned_addr_list)}
 
-        for review in soup.find_all('div', class_='review'):
-            address = extract_address(review)
-            if city in address['address']:
-                id_name = extract_id_and_name(review)
-                price_category = extract_price_and_category(review)
+    def extract_id_and_name(self, soup_snippet):
+        """
 
-                merge_dicts = reduce(lambda d1, d2: dict(d1, **d2),
-                                     (id_name,
-                                      address,
-                                      price_category))
+        """
+        hash_value = soup_snippet.find(
+            'a', class_="biz-name").get('data-hovercard-id')
 
-                places.append(merge_dicts)
+        name = soup_snippet.find('a', class_='biz-name').get_text()
 
-    return places
+        return {'_id': hash_value, 'name': name}
 
+    def extract_price_and_category(self, soup_snippet):
+        """
 
-def get_number_of_pages(soup_snippet):
-    """
+        """
+        price_category_list = soup_snippet.find(
+            'div', class_='price-category').get_text().split('\n')
 
-    """
-    return int(soup_snippet.find(
-        'td', class_='range-of-total').get_text().strip().split(' ')[-1])
+        # clean up the list
+        price_category_list = [i for i in price_category_list if i is not u'']
+        category_index = 0 if len(price_category_list) is 1 else 1
+        price_category_list[category_index] = [
+            i.strip() for i in price_category_list[category_index].split(',')]
 
+        # translate the yelp price symbol into a integer, if price exists
+        if category_index > 0:
+            price_category_list[0] = len(price_category_list[0])
 
-def replace_all(text, dic):
-    for i, j in dic.iteritems():
-        text = text.replace(i, j)
-    return text
+            return {'price': price_category_list[0],
+                    'categories': price_category_list[category_index]}
 
+        return {'categories': price_category_list[category_index]}
 
-def extract_address(soup_snippet):
-    """
-    bs4.element.Tag
-    """
-    soup_snippet_string = str(soup_snippet.find('address'))
+    def extract_rating(self, soup_snippet, review_length=100):
+        """
 
-    # Deals with all the first addr lines in address string,
-    # last address line is a special case
-    cleaned_addr_list = replace_all(soup_snippet_string,
-                                    {'\n': '',
-                                     '<br>': ',',
-                                     '<address>': ''}
-                                    ).strip().split(',')[:-1]
+        """
+        rating = float(soup_snippet.find(
+            'div', class_='rating-very-large').find(
+            'i').get('title').split(' ')[0])
 
-    return {'address': ' '.join(
-        item.decode('utf-8') for item in cleaned_addr_list)}
+        rating_date = soup_snippet.find(
+            'span', class_='rating-qualifier').get_text().strip()
 
+        rating_text = soup_snippet.find(
+            'div', class_='review-content').find('p').get_text()[:review_length]
 
-def extract_id_and_name(soup_snippet):
-    """
-
-    """
-    hash_value = soup_snippet.find(
-        'a', class_="biz-name").get('data-hovercard-id')
-
-    name = soup_snippet.find('a', class_='biz-name').get_text()
-
-    return {'_id': hash_value, 'name': name}
-
-
-def extract_price_and_category(soup_snippet):
-    """
-
-    """
-    price_category_list = soup_snippet.find(
-        'div', class_='price-category').get_text().split('\n')
-
-    # clean up the list
-    price_category_list = [i for i in price_category_list if i is not u'']
-    category_index = 0 if len(price_category_list) is 1 else 1
-    price_category_list[category_index] = [
-        i.strip() for i in price_category_list[category_index].split(',')]
-
-    # translate the yelp price symbol into a integer, if price exists
-    if category_index > 0:
-        price_category_list[0] = len(price_category_list[0])
-
-        return {'price': price_category_list[0],
-                'categories': price_category_list[category_index]}
-
-    return {'categories': price_category_list[category_index]}
-
-
-def extract_rating(soup_snippet, review_length=100):
-    """
-
-    """
-    rating = float(soup_snippet.find('div', class_='rating-very-large').find(
-        'i').get('title').split(' ')[0])
-
-    rating_date = soup_snippet.find(
-        'span', class_='rating-qualifier').get_text().strip()
-
-    rating_text = soup_snippet.find(
-        'div', class_='review-content').find('p').get_text()[:review_length]
-
-    return {'rating': rating, 'created_at': rating_date, 'text': rating_text}
+        return {'rating': rating,
+                'created_at': rating_date,
+                'text': rating_text}
