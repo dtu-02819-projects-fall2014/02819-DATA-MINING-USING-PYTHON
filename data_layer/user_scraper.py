@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import urllib2
 from bs4 import BeautifulSoup
+import re
 
 
 class UserScraper:
@@ -8,22 +9,10 @@ class UserScraper:
     def __init__(self):
         self.places = []
         self.users = []
-        self.soups = {}
-        self.soups_city = {}
+        self.__soups = {}
+        self.__soups_city = {}
 
-    def soup_reviews(self, user_id, page_start):
-        url = 'http://www.yelp.com/user_details_reviews_self?userid=%s'\
-            '&rec_pagestart=%d' % (user_id, page_start)
-        content = urllib2.urlopen(url).read()
-        return BeautifulSoup(content)
-
-    def soup_friends(self, user_id):
-        friends_url = 'http://www.yelp.com/user_details_friends?userid=%s'\
-            % (user_id)
-        content = urllib2.urlopen(friends_url).read()
-        return BeautifulSoup(content)
-
-    def put_it(self, user_id, city):
+    def put_it(self, user_id):
         """
 
         """
@@ -39,19 +28,21 @@ class UserScraper:
                 soup = self.soup_reviews(user_id, page*10)
                 pages.append(soup)
 
-        self.soups[user_id] = pages
-        self.soups_city[user_id] = []
+        self.__soups[user_id] = pages
+
+        # loads the users in, to prepare for soups for the specific city
+        self.__soups_city[user_id] = []
 
     def scrap_users_places(self, city):
         """
 
         """
-        for user, soups in self.soups.items():
+        for user, soups in self.__soups.items():
             for soup in soups:
                 for review in soup.find_all('div', class_='review'):
                     address = self.extract_address(review)
                     if city in address['address']:
-                        self.soups_city[user].append(review)
+                        self.__soups_city[user].append(review)
                         id_name = self.extract_id_and_name(review)
                         price_category = self.extract_price_and_category(review)
 
@@ -64,9 +55,10 @@ class UserScraper:
         """
 
         """
-        for user, reviews in self.soups_city.items():
+        for user, reviews in self.__soups_city.items():
             user_reviews = []
             user_info = self.extract_user_information(user)
+            user_votes = self.extract_votes(user)
 
             for review in reviews:
                 id_name = self.extract_id_and_name(review)
@@ -74,21 +66,26 @@ class UserScraper:
                 merge_dicts = dict(id_name.items() + rating_review.items())
                 user_reviews.append(merge_dicts)
 
+            review_count = len(user_reviews)
+
             self.users.append({'_id': user,
                                'location': user_info['location'],
                                'created_at': user_info['created_at'],
-                               'reviews': user_reviews})
+                               'reviews': user_reviews,
+                               'total_review_count': review_count,
+                               'review_votes': user_votes})
 
-    def extract_user_information(self, user_id):
-        location = self.soups[user_id][0].find(
-            'div', id='profile_questions').find_all('p')[0].get_text(
-            ).replace('\n', '').strip()
+    def soup_reviews(self, user_id, page_start):
+        url = 'http://www.yelp.com/user_details_reviews_self?userid=%s'\
+            '&rec_pagestart=%d' % (user_id, page_start)
+        content = urllib2.urlopen(url).read()
+        return BeautifulSoup(content)
 
-        creates_at = self.soups[user_id][0].find(
-            'div', id='profile_questions').find_all(
-                'p')[1].get_text().replace('\n', '').strip()
-
-        return {'location': location, 'created_at': creates_at}
+    def soup_friends(self, user_id):
+        friends_url = 'http://www.yelp.com/user_details_friends?userid=%s'\
+            % (user_id)
+        content = urllib2.urlopen(friends_url).read()
+        return BeautifulSoup(content)
 
     def get_number_of_pages(self, soup_snippet):
         """
@@ -101,6 +98,17 @@ class UserScraper:
         for i, j in dic.iteritems():
             text = text.replace(i, j)
         return text
+
+    def extract_user_information(self, user_id):
+        location = self.__soups[user_id][0].find(
+            'div', id='profile_questions').find_all('p')[0].get_text(
+            ).replace('\n', '').strip()
+
+        creates_at = self.__soups[user_id][0].find(
+            'div', id='profile_questions').find_all(
+                'p')[1].get_text().replace('\n', '').strip()
+
+        return {'location': location, 'created_at': creates_at}
 
     def extract_address(self, soup_snippet):
         """
@@ -168,3 +176,22 @@ class UserScraper:
         return {'rating': rating,
                 'created_at': rating_date,
                 'text': rating_text}
+
+    def extract_votes(self, user_id):
+        """
+
+        """
+        search_str = 'i-wrap ig-wrap-user_social '\
+            'i-review-votes-user_social-wrap smaller'
+
+        first_user_page = self.__soups[user_id][0]
+
+        vote_str = first_user_page.find('p', class_=search_str).get_text()
+
+        votes = map(int, re.findall('\d+', vote_str))
+
+        rev_votes = {}
+
+        rev_votes['usefull'], rev_votes['funny'], rev_votes['cool'] = votes
+
+        return rev_votes
