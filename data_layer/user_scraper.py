@@ -43,7 +43,7 @@ class UserScraper:
                     address = self.extract_address(review)
                     if city in address['address']:
                         self.__soups_city[user].append(review)
-                        id_name = self.extract_id_and_name(review)
+                        id_name = self.extract_information(review)
                         price_category = self.extract_price_and_category(review)
 
                         merge_dicts = reduce(lambda d1, d2: dict(d1, **d2),
@@ -61,7 +61,7 @@ class UserScraper:
             user_votes = self.extract_votes(user)
 
             for review in reviews:
-                id_name = self.extract_id_and_name(review)
+                id_name = self.extract_information(review)
                 rating_review = self.extract_rating(review)
                 merge_dicts = dict(id_name.items() + rating_review.items())
                 user_reviews.append(merge_dicts)
@@ -126,7 +126,7 @@ class UserScraper:
         return {'address': ' '.join(
             item.decode('utf-8') for item in cleaned_addr_list)}
 
-    def extract_id_and_name(self, soup_snippet):
+    def extract_information(self, soup_snippet):
         """
 
         """
@@ -135,7 +135,10 @@ class UserScraper:
 
         name = soup_snippet.find('a', class_='biz-name').get_text()
 
-        return {'_id': hash_value, 'name': name}
+        url = u'http://www.yelp.dk{0}'.format(soup_snippet.find(
+            'a', class_='biz-name').get('href'))
+
+        return {'_id': hash_value, 'name': name, 'url': url}
 
     def extract_price_and_category(self, soup_snippet):
         """
