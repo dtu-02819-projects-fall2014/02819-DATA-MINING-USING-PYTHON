@@ -1,0 +1,137 @@
+<!doctype html>
+<html>
+
+  <head>
+    <title>Yelp Suggestions</title>
+    <link rel="stylesheet" type="text/css" href="/static/base.css">
+    <link rel="stylesheet" type="text/css" href="/static/skeleton.css">
+    <link rel="stylesheet" type="text/css" href="/static/layout.css">
+    <style>
+      .container, .feature{
+      text-align:center;
+      margin-top: 75px;
+      margin-bottom:0px;
+      }
+
+      h4 {
+      padding-left:20px;
+      letter-spacing:15px;
+      margin-bottom:15px;
+      }
+      
+      .radio-buttons{
+      margin: 21px 1px 0 0;
+      }
+
+      #submit-button{
+      margin-top:75px;
+      }
+
+      ul li {
+      display: block;
+      margin: 23px 0px 0 0;
+      }
+      
+      ul {
+      margin-bottom: 75px;
+      }
+      a {
+      text-decoration: none;
+      text-align:center;
+      font-size:18px;
+
+      }
+      #home {
+      
+      font-size:18px;
+      }
+      
+      
+      a:hover {
+      text-decoration: underline;
+      }
+
+    </style>
+  </head>
+
+
+  <body>
+
+    <div class="sixteen columns container">
+      <h1>Suggestions by Ratings</h1>
+    </div>
+
+    <div class="container">
+      <div class="columns two feature" >
+      </div>
+
+      {% if places %}
+      <div class="five columns feature" >
+	<h2 style="margin-bottom:60px">Places</h2>
+	<ul>
+	  {% for p in places %}
+	  <li><a href={{p['url']}}>{{p['name']}}</a></li>
+	  {% endfor %}
+	</ul>
+      </div>
+
+
+      <div class="columns two feature" >
+      </div>
+      
+
+      <div class="five columns feature"  >
+
+	<h2>Ratings</h2>
+	<h4>12345</h4>
+	<form action="/ratings/" method="Post" >
+	  {% for p in places %}
+	  <div class="radio-buttons">
+	    <input type="radio" name="{{ p['_id'] }}" value="1" checked>
+	    <input type="radio" name="{{ p['_id'] }}" value="2">
+	    <input type="radio" name="{{ p['_id'] }}" value="3">
+	    <input type="radio" name="{{ p['_id'] }}" value="4">
+	    <input type="radio" name="{{ p['_id'] }}" value="5">
+	  </div>
+	  {% endfor %}
+	  <div  id="submit-button">
+	    <input type="submit" value="Get your suggestion!">
+	  </div>
+	</form>
+      </div>
+ 
+      
+      {% elif suggestions %}
+      <div style="margin-top:50px" class="twelve columns feature" >
+	<h2>We Suggest:</h2>
+	<ul style="margin-top:75px">
+	  {% for s in suggestions %}
+	  <li><a href={{ s['url'] }}>{{ s.items() }}</a></li>
+	  {% endfor %}
+	</ul>
+      </div>
+      {% endif %}
+  
+      <div class="columns two feature" >
+      </div>
+
+    </div>
+
+
+    <div class="sixteen columns container">
+      <a href="/"><img src="../static/images/home.jpg" alt="home"></a>
+    </div>
+
+    {% if log %}
+    <div class="container">
+      <div class="two columns feature" >
+	<p>logs: {% for l in log.items() %} {{ l }} {% endfor %}</p>
+      </div>
+      <div class="columns fourteen feature" >
+      </div>
+    </div>
+    {% endif %}
+  
+  </body>
+</html>
+
