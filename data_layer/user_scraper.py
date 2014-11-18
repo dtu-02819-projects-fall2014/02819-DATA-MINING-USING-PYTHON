@@ -50,7 +50,7 @@ def get_user(user_id,length=100,city=u'k\xf8benhavn'):
             r = {}
             p = {}
             t_review_count+=1
- 
+            
             rep={'\n':' ','St':'St ','Ave': 'Ave ','Broadway': 'Broadway ', 'Blvd': 'Blvd ','Rd': 'Rd '}
             p['address'] = replace_all(a.find('address',class_ = 'smaller').get_text().strip(),rep)
             
@@ -60,13 +60,13 @@ def get_user(user_id,length=100,city=u'k\xf8benhavn'):
                 
                 #We store the place in a separate database
                 p['name'] = a.find('a').get_text().replace('\n','').strip()
-                p['_id'] = a.find('a').get('href').split('=')[1].replace('\n','')
+                p['_id'] = a.find('a').get('id').split('=')[1].replace('\n','')
+                
             
-            
-                #p['url'] = 'http://www.yelp.com'+a.find('a').get('href').split('?hrid')[0]
+                p['url'] = 'http://www.yelp.com'+a.find('a').get('href').split('?hrid')[0]
                 p['price'] = None
                 p['categories'] = [c.get_text('href').replace('\n','').strip() for c in a.find('p').find_all('a')]
-           
+                
             
                 #We only take the id and the name of the place in the review in order to not overload the user
                 r['place_id'] = p['_id']
@@ -78,12 +78,13 @@ def get_user(user_id,length=100,city=u'k\xf8benhavn'):
                 if len(r['text']) >length :
                     r['text']=r['text'][:length]+'...'
                 reviews.append(r)
-            
-                places.insert(p)
-                print p['name'], 'inserted in places db'
-        
 
-        sleep_rand()
+                if(places.find({'_id':p['_id']}).count() == 0):
+                    places.insert(p)
+                    print p['name'], 'inserted in places db'
+                    
+
+
         if len(soup.find_all('td',class_='nav-links')) <2:
             break
         page_start+=10
