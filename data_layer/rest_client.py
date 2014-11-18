@@ -57,12 +57,6 @@ def by_user_name():
     return render_template('user.html', name=name, suggestions = suggestions, error = error)
 
 
-@app.route('/user:<id>/')
-def user(id):
-    user_data = get_user(id)
-    return jsonify({'user':user_data})
-
-
 
 
 
