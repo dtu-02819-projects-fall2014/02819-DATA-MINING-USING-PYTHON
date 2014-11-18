@@ -9,7 +9,7 @@ from pymongo import MongoClient
 
 client=MongoClient('localhost',27017)
 db=client.yelp_db
-users_info=db.user_info
+users_info=db.users_info
 places=db.places
 
 
