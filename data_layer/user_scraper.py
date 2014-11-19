@@ -12,28 +12,33 @@ class UserScraper:
         self.__soups = {}
         self.__soups_city = {}
 
-    def put_it(self, user_id):
+    def scrap_users(self, city, users_ids):
         """
 
         """
         include_last_page = 1
-        soup = self.soup_reviews(user_id, 0)
-        pages = [soup]
 
-        # partition page_interval in tens
-        page_interval = self.get_number_of_pages(soup)/10
+        for user_id in users_ids:
+            soup = self.soup_reviews(user_id, 0)
+            pages = [soup]
 
-        for page in xrange(page_interval+include_last_page):
-            if page is not 0:
-                soup = self.soup_reviews(user_id, page*10)
-                pages.append(soup)
+            # partition page_interval in tens
+            page_interval = self.get_number_of_pages(soup)/10
 
-        self.__soups[user_id] = pages
+            for page in xrange(page_interval+include_last_page):
+                if page is not 0:
+                    soup = self.soup_reviews(user_id, page*10)
+                    pages.append(soup)
 
-        # loads the users in, to prepare for soups for the specific city
-        self.__soups_city[user_id] = []
+            self.__soups[user_id] = pages
 
-    def scrap_users_places(self, city):
+            # loads the users in, to prepare for soups for the specific city
+            self.__soups_city[user_id] = []
+
+        self.__scrap_users_places(city)
+        self.__scrap_users_reviews()
+
+    def __scrap_users_places(self, city):
         """
 
         """
@@ -41,7 +46,7 @@ class UserScraper:
             for soup in soups:
                 for review in soup.find_all('div', class_='review'):
                     address = self.extract_address(review)
-                    if city in address['address']:
+                    if city.lower() in address['address'].lower():
                         self.__soups_city[user].append(review)
                         id_name = self.extract_information(review)
                         price_category = self.extract_price_and_category(review)
@@ -51,7 +56,7 @@ class UserScraper:
 
                         self.places.append(merge_dicts)
 
-    def scrap_users_reviews(self):
+    def __scrap_users_reviews(self):
         """
 
         """
