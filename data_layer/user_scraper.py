@@ -22,6 +22,7 @@ class UserScraper:
         self.users = []
         self.__soups = {}
         self.__soups_city = {}
+        self.__place_record = set()
 
     def scrap_users(self, city, users_ids):
         """
@@ -72,6 +73,12 @@ class UserScraper:
                     if city.lower() in address['address'].lower():
                         self.__soups_city[user].append(review)
                         id_name = self.extract_information(review)
+
+                        if id_name['_id'] in self.__place_record:
+                                continue
+
+                        self.__place_record.add(id_name['_id'])
+
                         price_category = self.extract_price_and_category(review)
 
                         merge_dicts = reduce(lambda d1, d2: dict(d1, **d2),
@@ -142,7 +149,8 @@ class UserScraper:
         Returns the number of pages on the users review page
 
         Args:
-            soup_snippet (bs4.element.Tag): bs4 tag containing the review page
+            soup_snippet (bs4.element.Tag): bs4 tag containing
+            the review page
 
         Return:
             int -- The number of pages
@@ -169,6 +177,7 @@ class UserScraper:
 
     def extract_user_information(self, user_id):
         """
+        
 
         """
         location = self.__soups[user_id][0].find(
@@ -177,7 +186,7 @@ class UserScraper:
 
         creates_at = self.__soups[user_id][0].find(
             'div', id='profile_questions').find_all(
-            'p')[1].get_text().replace('\n', '').strip()
+                'p')[1].get_text().replace('\n', '').strip()
 
         return {'location': location, 'created_at': creates_at}
 
@@ -236,7 +245,7 @@ class UserScraper:
     def extract_rating(self, soup_snippet, review_length=100):
         """
 
-       """
+        """
         rating = float(soup_snippet.find(
             'div', class_='rating-very-large').find(
             'i').get('title').split(' ')[0])
