@@ -1,56 +1,66 @@
 from flask import Flask, jsonify
-import pymongo
-from pymongo import MongoClient
 import json
 import yelp_json
 from user_scraper import get_user
+from flask import render_template, url_for, request
+from random import shuffle
+import helper_functions
 
-client=MongoClient('localhost',27017)
-db=client.flask_db
-search=db.search
+app = Flask(__name__, static_url_path = '/static')
 
-app = Flask(__name__)
-
-
-
-CONSUMER_KEY = 'Fo0uLsgv__5F6ZK9e-zokQ'
-CONSUMER_SECRET = 'wNPVw-bakq4mz6_Nv3EcfkvXku0'
-TOKEN = 'j4JkPkbIQ51MKn_Ie1jDO6uvC3TWavsX'
-TOKEN_SECRET = 'czOE7mgVVsRUl9bzuGe4Bn_xXlk'
 
 
 @app.route('/')
-def hello_world():
-    return 'Hi'
+def home():
+    return render_template('index.html')
 
-    
 
-@app.route('/search:<place_type>-<location>-<count>')
-def search(place_type='dinner',location='New York', count=10):
-    extractor = yelp_json.YelpApiDataExtractor(CONSUMER_KEY,CONSUMER_SECRET,TOKEN,TOKEN_SECRET)
-    json = extractor.query_api(place_type, location, count)
-    return jsonify({'json':json})
 
-@app.route('/search')
-def s():
-    return search()
+@app.route('/ratings/',methods = ['POST', 'GET'])
+@app.route('/ratings/<count>',methods = ['POST', 'GET'])
+def by_ratings(count=5):
 
-@app.route('/search_urls:<place_type>-<location>-<count>')
-def search_urls(place_type='dinner',location='New York', count=10):
-    extractor = yelp_json.YelpApiDataExtractor(CONSUMER_KEY,CONSUMER_SECRET,TOKEN,TOKEN_SECRET)
-    json = extractor.query_api(place_type, location, count)
-    urls = [elem['url'] for elem in json]
-    return jsonify({'urls':urls})
+    places = None
+    suggestions = None
+    log = None
 
-@app.route('/search_urls')
-def s_urls():
-    return search_urls()
+    if request.method == 'GET':
+        places = helper_functions.get_places()
+        shuffle(places)
+        places=places[:min(int(count),20)]
 
-@app.route('/user:<id>')
-def user(id):
-    user_data = get_user(id)
-    return jsonify({'user':user_data})
+    if request.method == 'POST':
+        #values of form [ ( place_id, rating ), ... ]
+        values = request.form.items()
+
+
+        log=helper_functions.add_ratings_to_db(values)
+        
+        #only return the user for the moment
+        suggestions =  helper_functions.get_suggestions_ratings(log['_id'])
+            
+    return render_template('ratings.html', places=places, suggestions = suggestions, log=log)
+
+
+@app.route('/user/',methods = ['POST', 'GET'])
+def by_user_name():
+    name = None
+    error = None
+    suggestions = None
+
+    if request.method == 'POST':
+        name = str(request.form['name'])
+        suggestions = helper_functions.get_suggestions_username(name)
+        if not suggestions:
+            error = "No user with name %s in database"%(name)
+
+    return render_template('user.html', name=name, suggestions = suggestions, error = error)
+
+
+
 
 
 if __name__ == '__main__':
+
     app.run(debug=True)
+    

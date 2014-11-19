@@ -12,7 +12,6 @@ db = client.yelp_db
 users_info = db.user_info
 places = db.places
 
-
 def soup_reviews(user_id, page_start):
     url = 'http://www.yelp.com/user_details_reviews_self?userid=%s'\
         '&rec_pagestart=%d' % (user_id, page_start)
@@ -89,16 +88,12 @@ def get_user(user_id, length=100, city=u'k\xf8benhavn'):
                 if len(r['text']) > length:
                     r['text'] = r['text'][:length] + '...'
                 reviews.append(r)
+                if(places.find({'_id':p['_id']}).count() == 0):
+                    places.insert(p)
+                    print p['name'], 'inserted in places db'
 
-                places.insert(p)
-                print p['name'], 'inserted in places db'
-
-        sleep_rand()
-        if len(soup.find_all('td', class_='nav-links')) < 2:
-            break
-        page_start += 10
-
-    print 'getting user informations..'
+        if len(soup.find_all('td',class_='nav-links')) <2:
+            print 'getting user informations..'
     user = {}
     user['_id'] = user_id
 
