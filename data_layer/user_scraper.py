@@ -94,7 +94,7 @@ class UserScraper:
         """
         for user, reviews in self.__soups_city.items():
             user_reviews = []
-            user_info = self.extract_user_information(user)
+            user_info = self.__extract_user_information(user)
             user_votes = self.extract_votes(user)
 
             for review in reviews:
@@ -175,10 +175,17 @@ class UserScraper:
             text = text.replace(i, j)
         return text
 
-    def extract_user_information(self, user_id):
+    def __extract_user_information(self, user_id):
         """
-        
+        Utillize the internal soups dict with the users pages to find
+        the information of the user.
 
+        Args:
+            user_id (str): The users hash is used af key in the dict
+            to find the correct page list.
+
+        Return:
+            dict -- Dict object with the key 'location' and 'created_at'
         """
         location = self.__soups[user_id][0].find(
             'div', id='profile_questions').find_all('p')[0].get_text(
@@ -192,7 +199,15 @@ class UserScraper:
 
     def extract_address(self, soup_snippet):
         """
-        bs4.element.Tag
+        Given a soup snippet, the method finds the address of the
+        place in the snippet, and wraps it in a dict.
+
+        Args:
+            soup_snippet (bs4.element.Tag): The soup snippet that should
+            be search through.
+
+        Return:
+            A dict object with 'address' as key
         """
         soup_snippet_string = str(soup_snippet.find('address'))
 
@@ -208,6 +223,16 @@ class UserScraper:
 
     def extract_information(self, soup_snippet):
         """
+        Given a soup snippet, the method finds the place information of the
+        place in the snippet, and wraps it in a dict.
+
+        Args:
+            soup_snippet (bs4.element.Tag): The soup snippet that should
+            be search through.
+
+        Return:
+            A dict object with '_id' as key, corresponds to the hash code of
+            place and 'name' as key
 
         """
         hash_value = soup_snippet.find(
@@ -222,7 +247,15 @@ class UserScraper:
 
     def extract_price_and_category(self, soup_snippet):
         """
+        Given a soup snippet, the method finds the price and category of the
+        place in the snippet, and wraps it in a dict.
 
+        Args:
+            soup_snippet (bs4.element.Tag): The soup snippet that should
+            be search through.
+
+        Return:
+            A dict object with 'price', and 'categories' as keys
         """
         price_category_list = soup_snippet.find(
             'div', class_='price-category').get_text().split('\n')
@@ -244,6 +277,20 @@ class UserScraper:
 
     def extract_rating(self, soup_snippet, review_length=100):
         """
+        Given a soup snippet, the method finds the users rating of his/hers
+        places, and also extract the first n characters of the the review text.
+        Furthermore it also extract the date the review was written.
+
+        Args:
+            soup_snippet (bs4.element.Tag): The soup snippet that should
+            be search through.
+
+        Kwargs:
+            review_length (int): Defines the number of charactors the method
+            should grab from the review. Is initial 100.
+
+        Return:
+            A dict object with 'rating', 'created_at' and 'text' as keys
 
         """
         rating = float(soup_snippet.find(
