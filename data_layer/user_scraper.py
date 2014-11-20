@@ -95,7 +95,7 @@ class UserScraper:
         for user, reviews in self.__soups_city.items():
             user_reviews = []
             user_info = self.__extract_user_information(user)
-            user_votes = self.extract_votes(user)
+            user_votes = self.__extract_votes(user)
 
             for review in reviews:
                 id_name = self.extract_information(review)
@@ -307,8 +307,18 @@ class UserScraper:
                 'created_at': rating_date,
                 'text': rating_text}
 
-    def extract_votes(self, user_id):
+    def __extract_votes(self, user_id):
         """
+        Utillize the internal soups dict with the users pages to find
+        the votes of the user.
+
+        Args:
+            user_id (str): The users hash is used af key in the dict
+            to find the correct page list.
+
+        Return:
+            dict -- Dict object with the key 'usefull', 'funny' and
+            'cool'
 
         """
         search_str = 'i-wrap ig-wrap-user_social '\
