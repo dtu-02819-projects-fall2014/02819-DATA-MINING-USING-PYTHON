@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
+Script for scraping places on the yelp webside
 
 """
 
@@ -10,7 +11,14 @@ from bs4 import BeautifulSoup
 
 def scrap_users(url_list):
     """
-    :params url_list: list of yelp restaurant urls
+    Takes a list of place url and returns all the user id hashes
+    that have writte a review of the place.
+
+    Args:
+        url_list (str): The url to the place
+
+    Return:
+        A dict object with all user id hashes and user names
 
     """
     user_hashes = {}
@@ -37,7 +45,13 @@ def scrap_users(url_list):
 
 def get_number_of_pages(soup):
     """
+    Returns the number of pages on a place site
 
+    Args:
+        soup (bs4.elements.tag):the soup object to find the number of pages in
+
+    Return:
+        int -- the number of pages
     """
     number_of_pages = int(soup.find('div', class_='page-of-pages').get_text(
         ).strip().split(' ')[-1])
@@ -47,7 +61,14 @@ def get_number_of_pages(soup):
 
 def next(base_url, next_page, num):
     """
+    Given a url the the base place site, the first page, and the next page as
+    a number it returns the url as a str to the next page with the correct
+    page number
 
+    Args:
+        base_url (str): The url to the base page of the place
+        next_page (int): The page number to go to
+        num (int): The interval the page is partition in
     """
     if next_page == 0:
         return base_url
