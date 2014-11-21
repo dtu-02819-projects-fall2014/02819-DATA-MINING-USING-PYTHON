@@ -1,7 +1,7 @@
 from flask import Flask, jsonify
 import json
 import yelp_json
-from user_scraper import get_user
+# from user_scraper import get_user
 from flask import render_template, url_for, request
 from random import shuffle
 import helper_functions

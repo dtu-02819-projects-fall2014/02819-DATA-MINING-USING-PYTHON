@@ -26,13 +26,13 @@ class YelpApiDataExtractor:
         """
 
         """
-        response = self.__search(term, location, search_limit)
+        try:
+            response = self.__search(term, location, search_limit)
+        except YelpApiError as e:
+            print e
+            return
 
         businesses = response.get('businesses')
-
-        if not businesses:
-            print('No businesses for {0} in {1} found.'.format(term, location))
-            return
 
         return businesses
 
@@ -61,11 +61,18 @@ class YelpApiDataExtractor:
 
         signed_url = self.__oatuh(url)
 
-        connection = urllib2.urlopen(signed_url, None)
+        connection = None
+
         try:
+            connection = urllib2.urlopen(signed_url, None)
             response = json.loads(connection.read())
+        except urllib2.HTTPError as e:
+            raise YelpApiError('{0} --> Check parameters'.format(e))
+        except ValueError as e1:
+            raise YelpApiError(e1)
         finally:
-            connection.close()
+            if connection is not None:
+                connection.close()
 
         return response
 
@@ -90,3 +97,15 @@ class YelpApiDataExtractor:
         signed_url = oauth_request.to_url()
 
         return signed_url
+
+
+class YelpApiError(Exception):
+    """
+    Error to be thrown by the API
+    """
+
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):
+        return repr(self.msg)

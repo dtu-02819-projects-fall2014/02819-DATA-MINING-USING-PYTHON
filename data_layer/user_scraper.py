@@ -8,6 +8,7 @@ class UserScraper:
     """
     The UserScraper class includes tools for scraping the Yelp users places and
     the review of those. After class instantiation, run the srap_users method
+    import populate_db
     with a list of user ids. Afterwords you will be able to get a list
     containing dictionaries of places the users have visited and a list
     containing dictionaries with the users and the reviews.
@@ -37,6 +38,8 @@ class UserScraper:
         """
         include_last_page = 1
 
+        print('Start downlaoding pages...')
+
         for user_id in users_ids:
             soup = self.soup_reviews(user_id, 0)
             pages = [soup]
@@ -45,6 +48,9 @@ class UserScraper:
             page_interval = self.get_number_of_pages(soup)/10
 
             for page in xrange(page_interval+include_last_page):
+                print('Start downloading page {0} of {1} from user {2}'.format(
+                    page+1, page_interval+1, user_id))
+
                 if page is not 0:
                     soup = self.soup_reviews(user_id, page*10)
                     pages.append(soup)
@@ -53,6 +59,10 @@ class UserScraper:
 
             # loads the users in, to prepare for soups for the specific city
             self.__soups_city[user_id] = []
+
+            print('User {0} pages are downloadet'.format(user_id))
+
+        print('Download done - Start processing data...')
 
         self.__scrap_users_places(city)
         self.__scrap_users_reviews()
@@ -126,7 +136,8 @@ class UserScraper:
         """
         url = 'http://www.yelp.com/user_details_reviews_self?userid=%s'\
             '&rec_pagestart=%d' % (user_id, page_start)
-        content = urllib2.urlopen(url).read()
+        openUrl = urllib2.urlopen(url)
+        content = openUrl.read()
         return BeautifulSoup(content)
 
     def soup_friends(self, user_id):
