@@ -6,6 +6,7 @@ import data_layer.yelp_json as yelp_api
 
 def config_api(config_file):
     """
+    Config Yelp Api with token specified in the conf.ini file
 
     """
     config = ConfigParser.ConfigParser()
