@@ -25,7 +25,7 @@ class UserScraper:
         self.__soups_city = {}
         self.__place_record = set()
 
-    def scrap_users(self, city, users_ids):
+    def scrap_users(self, city, filter_state, users_ids):
         """
         The method has to be invoked to start the scraping of the places and
         the review of the Yelp users
@@ -35,24 +35,33 @@ class UserScraper:
             from to be scrapped
             user_ids (str list): A list containing all the users hashcode,
             which the scraper should extract places and reviews from.
+            filter_state (str): The Yelp fiter state, f.eks. Copenhagen is
+            '84', paris is '75', New York is 'NY'
         """
         include_last_page = 1
 
-        print('Start downlaoding pages...')
-
         for user_id in users_ids:
-            soup = self.soup_reviews(user_id, 0)
-            pages = [soup]
+            print('Start downlaoding user {0}'.format(user_id))
+
+            soup = self.soup_reviews_by_filter(user_id, 0, city, filter_state)
+
+            page_interval = self.get_number_of_pages(soup)
+
+            if page_interval is None:
+                continue
 
             # partition page_interval in tens
-            page_interval = self.get_number_of_pages(soup)/10
+            page_interval /= 10
+
+            pages = [soup]
 
             for page in xrange(page_interval+include_last_page):
-                print('Start downloading page {0} of {1} from user {2}'.format(
-                    page+1, page_interval+1, user_id))
+                print('Start downloading page {0} of {1}'.format(
+                    page+1, page_interval+1))
 
                 if page is not 0:
-                    soup = self.soup_reviews(user_id, page*10)
+                    soup = self.soup_reviews_by_filter(
+                        user_id, page*10, city, filter_state)
                     pages.append(soup)
 
             self.__soups[user_id] = pages
@@ -122,21 +131,25 @@ class UserScraper:
                                'total_review_count': review_count,
                                'review_votes': user_votes})
 
-    def soup_reviews(self, user_id, page_start):
+    def soup_reviews_by_filter(self, user_id, page_start, city, filter_state):
         """
-        Generate a url to the specific user review page
+        Generate a url to the specific user review page, from a specified city
 
         Args:
             user_id (str): The hashcode of the user
             page_start: Which user review site to start at, shold
             be divisible with ten, to avoid missing som reviews.
+            filter_state (str): The Yelp fiter state, f.eks. Copenhagen is
+            '84', paris is '75', New York is 'NY'
 
         Return:
             str -- The url to the user review page
         """
         url = 'http://www.yelp.com/user_details_reviews_self?userid=%s'\
-            '&rec_pagestart=%d' % (user_id, page_start)
-        openUrl = urllib2.urlopen(url)
+            '&review_filter=location&location_filter_city=%s'\
+            '&location_filter_state=%s&rec_pagestart=%d'\
+            % (user_id, city, filter_state, page_start)
+        openUrl = urllib2.urlopen(url.encode('utf-8'))
         content = openUrl.read()
         return BeautifulSoup(content)
 
@@ -166,8 +179,13 @@ class UserScraper:
         Return:
             int -- The number of pages
         """
-        return int(soup_snippet.find(
-            'td', class_='range-of-total').get_text().strip().split(' ')[-1])
+        range_of_total = soup_snippet.find('td', class_='range-of-total')
+
+        # the user might not have any reviews
+        if range_of_total is None:
+            return None
+
+        return int(range_of_total.get_text().strip().split(' ')[-1])
 
     def replace_all(self, text, dic):
         """
@@ -273,18 +291,27 @@ class UserScraper:
 
         # clean up the list
         price_category_list = [i for i in price_category_list if i is not u'']
-        category_index = 0 if len(price_category_list) is 1 else 1
-        price_category_list[category_index] = [
-            i.strip() for i in price_category_list[category_index].split(',')]
 
-        # translate the yelp price symbol into a integer, if price exists
-        if category_index > 0:
-            price_category_list[0] = len(price_category_list[0])
+        try:
+            category_index = 0 if len(price_category_list) is 1 else 1
 
-            return {'price': price_category_list[0],
-                    'categories': price_category_list[category_index]}
+            price_category_list[category_index] = [
+                i.strip() for i in price_category_list[
+                    category_index].split(',')]
 
-        return {'categories': price_category_list[category_index]}
+            # translate the yelp price symbol into a integer, if price exists
+            if category_index > 0:
+                price_category_list[0] = len(price_category_list[0])
+
+                return {'price': price_category_list[0],
+                        'categories': price_category_list[category_index]}
+
+        except IndexError:
+            return {'price': None,
+                    'categories': None}
+
+        return {'price': None,
+                'categories': price_category_list[category_index]}
 
     def extract_rating(self, soup_snippet, review_length=100):
         """
