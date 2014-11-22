@@ -20,10 +20,10 @@ def config_api(config_file):
         for option in options:
             conf_dict[option] = config.get('Tokens', option)
 
-            yelp_api_obj = yelp_api.YelpApiDataExtractor(
-                conf_dict['consumer_key'],
-                conf_dict['consumer_secret'],
-                conf_dict['token'],
-                conf_dict['token_secret'])
+        yelp_api_obj = yelp_api.YelpApiDataExtractor(
+            conf_dict['consumer_key'],
+            conf_dict['consumer_secret'],
+            conf_dict['token'],
+            conf_dict['token_secret'])
 
         return yelp_api_obj

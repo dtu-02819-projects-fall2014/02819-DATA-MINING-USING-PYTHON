@@ -40,3 +40,6 @@ def run(port=27017, host='localhost', with_drop=True):
         handler.add_document, collection='places'), scraper.places)
     map(functools.partial(
         handler.add_document, collection='users_info'), scraper.users)
+
+if __name__ == '__main__':
+    run()
