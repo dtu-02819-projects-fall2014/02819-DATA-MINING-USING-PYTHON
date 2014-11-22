@@ -73,37 +73,34 @@ class UserScraper:
 
         print('Download done - Start processing data...')
 
-        self.__scrap_users_places(city)
+        self.__scrap_users_places()
         self.__scrap_users_reviews()
 
-    def __scrap_users_places(self, city):
+    def __scrap_users_places(self):
         """
         Scrap a users places of a specific city. Every time the method scrap a
         place, it save the soup of places review in an internal dictionary
         with the user_id as the key.
 
-        Args:
-            city (str): The city the reviews has to come from
         """
         for user, soups in self.__soups.items():
             for soup in soups:
                 for review in soup.find_all('div', class_='review'):
                     address = self.extract_address(review)
-                    if city.lower() in address['address'].lower():
-                        self.__soups_city[user].append(review)
-                        id_name = self.extract_information(review)
+                    self.__soups_city[user].append(review)
+                    id_name = self.extract_information(review)
 
-                        if id_name['_id'] in self.__place_record:
-                                continue
+                    if id_name['_id'] in self.__place_record:
+                            continue
 
-                        self.__place_record.add(id_name['_id'])
+                    self.__place_record.add(id_name['_id'])
 
-                        price_category = self.extract_price_and_category(review)
+                    price_category = self.extract_price_and_category(review)
 
-                        merge_dicts = reduce(lambda d1, d2: dict(d1, **d2),
-                                             (id_name, address, price_category))
+                    merge_dicts = reduce(lambda d1, d2: dict(d1, **d2),
+                                         (id_name, address, price_category))
 
-                        self.places.append(merge_dicts)
+                    self.places.append(merge_dicts)
 
     def __scrap_users_reviews(self):
         """
@@ -348,7 +345,7 @@ class UserScraper:
     def __extract_votes(self, user_id):
         """
         Utillize the internal soups dict with the users pages to find
-        the votes of the user.
+        the votes by the  user.
 
         Args:
             user_id (str): The users hash is used af key in the dict
@@ -364,12 +361,16 @@ class UserScraper:
 
         first_user_page = self.__soups[user_id][0]
 
-        vote_str = first_user_page.find('p', class_=search_str).get_text()
+        vote = first_user_page.find('p', class_=search_str)
 
+        # The user might not have given any votes
+        if vote is None:
+            return {'usefull': None, 'funny': None, 'cool': None}
+
+        vote_str = vote.get_text()
         votes = map(int, re.findall('\d+', vote_str))
 
         rev_votes = {}
-
         rev_votes['usefull'], rev_votes['funny'], rev_votes['cool'] = votes
 
         return rev_votes
