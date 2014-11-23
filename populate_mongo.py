@@ -80,5 +80,5 @@ if __name__ == '__main__':
 
     except IndexError:
         print('Arguments should be: \n <term> <location> <search_limit> '
-              '<city> <filter_state> <drop_db> (defualt: True),'
-              '<port> (default: 27017), <host> (default: localhost)')
+              '<city> <filter_state> <drop_db> (defualt: True) '
+              '<port> (default: 27017) <host> (default: localhost)')
