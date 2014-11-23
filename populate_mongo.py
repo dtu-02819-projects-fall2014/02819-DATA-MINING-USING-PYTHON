@@ -79,6 +79,6 @@ if __name__ == '__main__':
                 filter_state, drop_db, port, host)
 
     except IndexError:
-        print('Arguments should be: \n term, location, search_limit,'
-              'city, filter_state, drop_db (defualt: True),'
-              'port (default: 27017), host (default: localhost)')
+        print('Arguments should be: \n <term> <location> <search_limit> '
+              '<city> <filter_state> <drop_db> (defualt: True),'
+              '<port> (default: 27017), <host> (default: localhost)')
