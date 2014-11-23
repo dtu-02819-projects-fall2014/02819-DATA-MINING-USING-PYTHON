@@ -58,7 +58,9 @@ class UserScraper:
             pages = [soup]
 
             for page in xrange(page_interval+include_last_page):
+                # sleep the thread a few seconds inorder not to spam yelp
                 self.__sleep_rand()
+                
                 print('Start downloading page {0} of {1}'.format(
                     page+1, page_interval+1))
 
