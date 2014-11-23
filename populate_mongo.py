@@ -8,7 +8,7 @@ import data_layer.user_scraper as user_scraper
 import data_layer.mongo_handler as mongo_handler
 
 
-def run(term, location, search_limit, drop_db=True,
+def run(term, location, search_limit, city, filter_state, drop_db=True,
         port=27017, host='localhost'):
     """
     Populates the specified mongodb
@@ -17,6 +17,10 @@ def run(term, location, search_limit, drop_db=True,
         term (str): Specify which term to lookup, for example dinner
         location (str): Specify the location for example Copenhagen
         search_limet (int): How many results to return
+        city (str): Specify which city the place and reviews has to come
+        from to be scrapped
+        filter_state (str): The Yelp fiter state, e.g. København is
+        '84', paris is '75', New York is 'NY
 
     Kwargs:
         drop_db (bool): Default true, will drop db collections
@@ -39,7 +43,7 @@ def run(term, location, search_limit, drop_db=True,
     users = place_scraper.scrap_users(url_search_list)
     userList = [user for user in users]
 
-    scraper.scrap_users(u'københavn', '84', userList)
+    scraper.scrap_users(city, filter_state, userList)
     usersCollection = [{'_id': i, 'name': j} for i, j in users.items()]
 
     map(functools.partial(
@@ -54,23 +58,27 @@ if __name__ == '__main__':
         term = sys.argv[1]
         location = sys.argv[2]
         search_limit = int(sys.argv[3])
-        if len(sys.argv) > 4:
-            drop_db = bool(sys.argv[4])
-        elif len(sys.argv) > 5:
-            port = int(sys.argv[5])
-        elif len(sys.argv) > 6:
-            host = sys.argv[6]
+        city = unicode(sys.argv[4], 'utf-8')
+        filter_state = sys.argv[5]
+        if len(sys.argv) > 6:
+            drop_db = bool(sys.argv[6])
+        elif len(sys.argv) > 7:
+            port = int(sys.argv[7])
+        elif len(sys.argv) > 8:
+            host = sys.argv[8]
 
-        if len(sys.argv) is 4:
-            run(term, location, search_limit)
-        elif len(sys.argv) is 5:
-            run(term, location, search_limit, drop_db)
-        elif len(sys.argv) is 6:
-            run(term, location, search_limit, drop_db, port)
+        if len(sys.argv) is 6:
+            run(term, location, search_limit, city, filter_state)
         elif len(sys.argv) is 7:
-            run(term, location, search_limit, drop_db, port, host)
+            run(term, location, search_limit, city, filter_state, drop_db)
+        elif len(sys.argv) is 8:
+            run(term, location, search_limit, city,
+                filter_state, drop_db, port)
+        elif len(sys.argv) is 9:
+            run(term, location, search_limit, city,
+                filter_state, drop_db, port, host)
 
     except IndexError:
         print('Arguments should be: \n term, location, search_limit,'
-              'drop_db (defualt: True), port (default: 27017),'
-              'host (default: localhost)')
+              'city, filter_state, drop_db (defualt: True),'
+              'port (default: 27017), host (default: localhost)')

@@ -2,6 +2,8 @@
 import urllib2
 from bs4 import BeautifulSoup
 import re
+import time
+import random
 
 
 class UserScraper:
@@ -56,6 +58,7 @@ class UserScraper:
             pages = [soup]
 
             for page in xrange(page_interval+include_last_page):
+                self.__sleep_rand()
                 print('Start downloading page {0} of {1}'.format(
                     page+1, page_interval+1))
 
@@ -75,6 +78,13 @@ class UserScraper:
 
         self.__scrap_users_places()
         self.__scrap_users_reviews()
+
+    def __sleep_rand(self):
+        """
+        Makes the thread sleep a few seconds
+        """
+        a = random.uniform(0.5, 1)
+        time.sleep(a)
 
     def __scrap_users_places(self):
         """
