@@ -98,7 +98,7 @@
 	<h2 >We Suggest:</h2>
 	<ul style="margin-top:75px">
 	  {% for s in suggestions %}
-	  <li><a href={{ s['url'] }}>{{ s.items() }}</a></li>
+	  <li><a href={{ s['url'] }}>{{ s['name'] }}</a>, with similarity score: {{ s['score'] }}</li>
 	  {% endfor %}
 	</ul>
       </div>

@@ -85,7 +85,7 @@ class UserScraper:
         """
         Makes the thread sleep a few seconds
         """
-        a = random.uniform(0.5, 1)
+        a = random.uniform(1, 1.5)
         time.sleep(a)
 
     def __scrap_users_places(self):
@@ -134,6 +134,7 @@ class UserScraper:
             review_count = len(user_reviews)
 
             self.users.append({'_id': user,
+                               'name' : user_info['name'],
                                'location': user_info['location'],
                                'created_at': user_info['created_at'],
                                'reviews': user_reviews,
@@ -233,7 +234,9 @@ class UserScraper:
             'div', id='profile_questions').find_all(
                 'p')[1].get_text().replace('\n', '').strip()
 
-        return {'location': location, 'created_at': creates_at}
+        name = self.__soups[user_id][0].find( 'div', class_='about-connections').h1.get_text().split("'s Profile")[0].strip()
+
+        return {'location': location, 'created_at': creates_at, 'name' : name}
 
     def extract_address(self, soup_snippet):
         """

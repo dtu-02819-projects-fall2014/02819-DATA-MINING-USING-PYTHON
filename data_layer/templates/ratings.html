@@ -106,9 +106,15 @@
 	<h2>We Suggest:</h2>
 	<ul style="margin-top:75px">
 	  {% for s in suggestions %}
-	  <li><a href={{ s['url'] }}>{{ s.items() }}</a></li>
+	  <li><a href={{ s['url'] }}>{{ s['name'] }}</a>, with similarity score: {{ s['score'] }}</li>
 	  {% endfor %}
 	</ul>
+      </div>
+
+
+      {% else %}
+      <div style="margin-top:50px" class="twelve columns feature" >
+	<h2>No Suggestions available!</h2>
       </div>
       {% endif %}
   
@@ -125,7 +131,7 @@
     {% if log %}
     <div class="container">
       <div class="two columns feature" >
-	<p>logs: {% for l in log.items() %} {{ l }} {% endfor %}</p>
+	<p>added user in db: {% for l in log.items() %} {{ l }} {% endfor %}</p>
       </div>
       <div class="columns fourteen feature" >
       </div>

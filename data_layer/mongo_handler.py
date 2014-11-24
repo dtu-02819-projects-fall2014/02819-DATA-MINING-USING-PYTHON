@@ -20,8 +20,8 @@ class YelpMongoHandler():
         elif collection == 'places':
             return self.db.places
 
-        elif collection == 'users_id':
-            return self.db.users_id
+#        elif collection == 'users_id':
+#            return self.db.users_id
 
         elif collection == 'frontend_users':
             return self.db.frontend_users
@@ -61,4 +61,4 @@ class YelpMongoHandler():
         Args:
             collection (str): The collection to drop
         """
-        self.get_collection(collection).drop()
+        return self.get_collection(collection).drop()

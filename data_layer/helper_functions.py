@@ -1,56 +1,78 @@
-from mongo_handler import YelpMongoHandler
+import mongo_handler
+import recommendations
 import datetime
+import functools
 
-
+handler = mongo_handler.YelpMongoHandler()
 
 def add_ratings_to_db(values):
-
-    front_handler = YelpMongoHandler('frontend_users')
-    places_handler = YelpMongoHandler('places')
 
     user = {}
     reviews = []
 
     for v in values:
-        place = places_handler.get_documents(one = True, query = {'_id' : v[0]} )
+        place = handler.get_documents('places', one = True, query = {'_id' : v[0]} )
         review={}
-        review['place_id']=place['_id']
-        review['place_name']=place['name']
-        review['rating'] = v[1]
+        review['_id'] = place['_id']
+        review['name'] = place['name']
+        review['rating'] = float(v[1])
         reviews.append(review)
 
     user['reviews'] = reviews
     user['name'] = "anonym"
     
     #BETTER SOLUTION??
-    user['_id'] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    user['_id'] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
 
-    _return = front_handler.add_document( user )
+    _return = handler.add_document( user, 'frontend_users')
 
     return _return
 
 
 def get_places():
     
-    places_handler = YelpMongoHandler('places')
-
-    return places_handler.get_documents()
+    return handler.get_documents('places')
 
         
 def get_suggestions_ratings(_id):
 
-    front_handler = YelpMongoHandler('frontend_users')
-    user = front_handler.get_documents(one=True, query={'_id' : _id})
+
+    user = handler.get_documents('frontend_users',one=True, query={'_id' : _id})
     
-    return [user]
+    return _suggestions(user)
+
 
 def get_suggestions_username(name):
     
-    user_handler = YelpMongoHandler('users_info')
+
     #Hopefully no users with same name because then it would be with id
-    user =  user_handler.get_documents(one=True, query={'name' : name}) 
-    print user
-    print name
+    user =  handler.get_documents('users_info',one=True, query={'name' : name}) 
+
     if not user:
-        return None
-    return [ user ]
+        raise NameError("No user found with the name %s"%(name))
+
+    return _suggestions(user)
+
+def _suggestions(user):
+
+    users = handler.get_documents('users_info') + handler.get_documents('frontend_users')
+   
+    prefs = {}
+    for user in users:
+        prefs.update( _transform_for_suggestions(user))
+    
+    reco_ids = recommendations.getRecommendations(prefs , user['_id'])
+    
+    suggestions=[]
+    for score, place_id in reco_ids:
+        place = handler.get_documents('places', one = True, query = {'_id' : place_id })
+        place['score'] = score
+        suggestions.append( place )
+    return suggestions
+
+def _transform_for_suggestions( user ):
+    
+    ratings={}
+    for r in user['reviews']:
+        ratings[r['_id']] = r['rating']
+    return { user['_id'] : ratings }

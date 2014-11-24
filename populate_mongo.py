@@ -33,7 +33,7 @@ def run(term, location, search_limit, city, filter_state, drop_db=True,
     handler = mongo_handler.YelpMongoHandler()
 
     if drop_db:
-        handler.drop_collection('users_id')
+#        handler.drop_collection('users_id')
         handler.drop_collection('places')
         handler.drop_collection('users_info')
 
@@ -46,8 +46,8 @@ def run(term, location, search_limit, city, filter_state, drop_db=True,
     scraper.scrap_users(city, filter_state, userList)
     usersCollection = [{'_id': i, 'name': j} for i, j in users.items()]
 
-    map(functools.partial(
-        handler.add_document, collection='users_id'), usersCollection)
+#    map(functools.partial(
+#       handler.add_document, collection='users_id'), usersCollection)
     map(functools.partial(
         handler.add_document, collection='places'), scraper.places)
     map(functools.partial(
