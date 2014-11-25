@@ -11,8 +11,21 @@ import oauth2
 
 class YelpApiDataExtractor:
     """
+    This class is based on the script the yelp links to in its torurial.
+    The YelpApiDataExtractor, is a rewrite of this script, inorder to make
+    it simpler to interface with a more generel system.
 
+    The class is only considering businesses.
+
+    To get the tokens, one have to sign up at yelp.
+
+    Args:
+        consumer_key (str): The token that yelp provides
+        consumer_secret (str): The token that yelp provides
+        token (str): The token that yelp provides
+        token_secret (str): The token that yelp provides.
     """
+
     API_HOST = 'api.yelp.com'
     SEARCH_PATH = '/v2/search/'
 
@@ -24,7 +37,17 @@ class YelpApiDataExtractor:
 
     def query_api(self, term, location, search_limit):
         """
+        Call this methos inorder to query the api
 
+        Args:
+            term (str): The term could be 'dinner' e.g. it should correspond
+            to yelp term.
+            location (str): This is location that is registered in the api,
+            this means that is should be speled in english, so Copenhagen, not
+            København.
+            search_limit (int): How many results should be returned, their is
+            an unknown upper limit, a exception will be thrown if that limit
+            is reach
         """
         try:
             response = self.__search(term, location, search_limit)
