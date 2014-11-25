@@ -224,7 +224,8 @@ class UserScraper:
             to find the correct page list.
 
         Return:
-            dict -- Dict object with the key 'location' and 'created_at'
+            dict -- Dict object with the key 'location', 'created_at' and
+            'name'
         """
         location = self.__soups[user_id][0].find(
             'div', id='profile_questions').find_all('p')[0].get_text(
@@ -234,9 +235,13 @@ class UserScraper:
             'div', id='profile_questions').find_all(
                 'p')[1].get_text().replace('\n', '').strip()
 
-        name = self.__soups[user_id][0].find( 'div', class_='about-connections').h1.get_text().split("'s Profile")[0].strip()
+        name = self.__soups[user_id][0].find(
+            'div', class_='about-connections').h1.get_text().split(
+            "'s Profile")[0].strip()
 
-        return {'location': location, 'created_at': creates_at, 'name' : name}
+        return {'location': location,
+                'created_at': creates_at,
+                'name': name}
 
     def extract_address(self, soup_snippet):
         """
