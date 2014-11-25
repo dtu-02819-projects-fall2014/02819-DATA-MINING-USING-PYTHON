@@ -37,7 +37,7 @@ class YelpApiDataExtractor:
 
     def query_api(self, term, location, search_limit):
         """
-        Call this methos inorder to query the api
+        Call thisscraper.extract_information() methos inorder to query the api
 
         Args:
             term (str): The term could be 'dinner' e.g. it should correspond
@@ -48,6 +48,9 @@ class YelpApiDataExtractor:
             search_limit (int): How many results should be returned, their is
             an unknown upper limit, a exception will be thrown if that limit
             is reach
+
+            Return:
+                The result set in json format
         """
         try:
             response = self.__search(term, location, search_limit)
