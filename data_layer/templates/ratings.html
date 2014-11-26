@@ -112,9 +112,9 @@
       </div>
 
 
-      {% else %}
+      {% elif error %}
       <div style="margin-top:50px" class="twelve columns feature" >
-	<h2>No Suggestions available!</h2>
+	<h2>{{ error }}</h2>
       </div>
       {% endif %}
   

@@ -19,11 +19,12 @@ def home():
 @app.route('/ratings/',methods = ['POST', 'GET'])
 @app.route('/ratings/<count>',methods = ['POST', 'GET'])
 @app.route('/ratings/<count>/<sug_count>',methods = ['POST', 'GET'])
-def by_ratings(count = 5, sug_count = 5):
+def by_ratings(count=5, sug_count=5):
 
     places = None
     suggestions = None
     log = None
+    error = None
 
     if request.method == 'GET':
         places = helper_functions.get_places()
@@ -37,10 +38,13 @@ def by_ratings(count = 5, sug_count = 5):
         #return value of the mongo_handler add_document function
         log = helper_functions.add_ratings_to_db(values)
         
+        try :
+            suggestions =  helper_functions.get_suggestions_ratings(log['_id']) [:sug_count]
+        except Exception as e:
+            error = str(e)
 
-        suggestions =  helper_functions.get_suggestions_ratings(log['_id']) [:sug_count]
-            
-    return render_template('ratings.html', places=places, suggestions = suggestions, log=log)
+    return render_template('ratings.html', places=places,
+                           suggestions=suggestions, log=log, error=error)
 
 
 @app.route('/user/',methods = ['POST', 'GET'])
@@ -54,9 +58,9 @@ def by_user_name( sug_count = 5):
         name = str(request.form['name'])
         try :
             suggestions = helper_functions.get_suggestions_username(name) [:sug_count]
-        except NameError as e:
+        except Exception as e:
             error = str(e)
-
+            
     return render_template('user.html', name=name, suggestions = suggestions, error = error)
 
 

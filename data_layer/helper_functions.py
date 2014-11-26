@@ -20,8 +20,6 @@ def add_ratings_to_db(values):
 
     user['reviews'] = reviews
     user['name'] = "anonym"
-    
-    #BETTER SOLUTION??
     user['_id'] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
 
     _return = handler.add_document( user, 'frontend_users')
@@ -68,6 +66,10 @@ def _suggestions(user):
         place = handler.get_documents('places', one = True, query = {'_id' : place_id })
         place['score'] = score
         suggestions.append( place )
+    
+    if not suggestions:
+        raise ValueError("No suggestions available")
+
     return suggestions
 
 def _transform_for_suggestions( user ):
