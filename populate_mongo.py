@@ -49,6 +49,10 @@ def run(term, location, search_limit, city, filter_state, drop_db=True,
         n = i*num_of_scraps
         scraper = user_scraper.UserScraper()
         scraper.scrap_users(city, filter_state, userList[n:n+num_of_scraps])
+        map(functools.partial(
+            handler.add_document, collection='places'), scraper.places)
+        map(functools.partial(
+            handler.add_document, collection='users_info'), scraper.users)
 
     scraper = user_scraper.UserScraper()
     scraper.scrap_users(city, filter_state, userList[n+num_of_scraps:])
