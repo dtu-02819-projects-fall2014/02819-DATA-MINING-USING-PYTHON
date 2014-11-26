@@ -9,7 +9,7 @@ import data_layer.mongo_handler as mongo_handler
 
 
 def run(term, location, search_limit, city, filter_state, drop_db=True,
-        port=27017, host='localhost'):
+        port=27017, host='localhost', num_of_scraps=5):
     """
     Populates the specified mongodb
 
@@ -29,11 +29,9 @@ def run(term, location, search_limit, city, filter_state, drop_db=True,
     """
 
     yelp_api = configure_yelp_api.config_api('conf.ini')
-    scraper = user_scraper.UserScraper()
     handler = mongo_handler.YelpMongoHandler()
 
     if drop_db:
-#        handler.drop_collection('users_id')
         handler.drop_collection('places')
         handler.drop_collection('users_info')
 
@@ -43,11 +41,18 @@ def run(term, location, search_limit, city, filter_state, drop_db=True,
     users = place_scraper.scrap_users(url_search_list)
     userList = [user for user in users]
 
-    scraper.scrap_users(city, filter_state, userList)
-    usersCollection = [{'_id': i, 'name': j} for i, j in users.items()]
+    len_u = len(userList)/num_of_scraps
 
-#    map(functools.partial(
-#       handler.add_document, collection='users_id'), usersCollection)
+    n = 0
+
+    for i in xrange(len_u):
+        n = i*num_of_scraps
+        scraper = user_scraper.UserScraper()
+        scraper.scrap_users(city, filter_state, userList[n:n+num_of_scraps])
+
+    scraper = user_scraper.UserScraper()
+    scraper.scrap_users(city, filter_state, userList[n+num_of_scraps:])
+
     map(functools.partial(
         handler.add_document, collection='places'), scraper.places)
     map(functools.partial(
