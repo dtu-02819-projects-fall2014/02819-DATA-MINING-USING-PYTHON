@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 
-"""
-
-"""
 import json
 import urllib
 import urllib2
@@ -11,8 +8,21 @@ import oauth2
 
 class YelpApiDataExtractor:
     """
+    This class is based on the script the yelp links to in its torurial.
+    The YelpApiDataExtractor, is a rewrite of this script, inorder to make
+    it simpler to interface with a more generel system.
 
+    The class is only considering businesses.
+
+    To get the tokens, one have to sign up at yelp.
+
+    Args:
+        consumer_key (str): The token that yelp provides
+        consumer_secret (str): The token that yelp provides
+        token (str): The token that yelp provides
+        token_secret (str): The token that yelp provides.
     """
+
     API_HOST = 'api.yelp.com'
     SEARCH_PATH = '/v2/search/'
 
@@ -24,7 +34,20 @@ class YelpApiDataExtractor:
 
     def query_api(self, term, location, search_limit):
         """
+        Call thisscraper.extract_information() methos inorder to query the api
 
+        Args:
+            term (str): The term could be 'dinner' e.g. it should correspond
+            to yelp term.
+            location (str): This is location that is registered in the api,
+            this means that is should be speled in english, so Copenhagen, not
+            København.
+            search_limit (int): How many results should be returned, their is
+            an unknown upper limit, a exception will be thrown if that limit
+            is reach
+
+            Return:
+                The result set in json format
         """
         try:
             response = self.__search(term, location, search_limit)
@@ -38,6 +61,11 @@ class YelpApiDataExtractor:
 
     def __search(self, term, location, search_limit):
         """
+        The methods handles the search parameters, and wraps inside a url that
+        can be passed to API.
+
+        Return:
+            The request to the API
 
         """
 
@@ -52,6 +80,12 @@ class YelpApiDataExtractor:
 
     def __request(self, host, path, url_params=None):
         """
+        Handles the specific url to API, and is turning the API response into
+        json. The method throw exception if it is not possible to make a
+        connection to the yelp API, or if it not possible to load the json.
+
+        Return:
+            A json response from the yelp API
 
         """
         url_params = url_params or {}
@@ -78,6 +112,10 @@ class YelpApiDataExtractor:
 
     def __oatuh(self, url):
         """
+        Puth the oatuh2 token in the url
+
+        Return:
+            A signed url, that can be passed to the yelp API
 
         """
         consumer = oauth2.Consumer(self.consumer_key, self.consumer_secret)
