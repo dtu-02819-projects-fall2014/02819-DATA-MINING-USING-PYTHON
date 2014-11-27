@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 from nose.tools import assert_equals
 import os
 import urllib2
@@ -45,10 +46,10 @@ def test_extract_price_and_category_base_case():
 
 def test_extract_rating():
     assert_equals(scraper.extract_rating(user_test_soup),
-                  {'address': u'Esplanaden 4',
-                   'created_at': u'19-11-2014',
-                   'rating': 3.0, 'text': u'Et fors\xf8g p\xe5 at pr\xf8ve '\
-                   'alle sm\xf8rrebr\xf8dsrestauranter i K\xf8benhavn .. (Du kan l\xe6se de andre her p\xe5 siden'})
+                  {'created_at': u'19-11-2014',
+                   'rating': 3.0, 'text': u'Et fors\xf8g p\xe5 at pr\xf8ve '
+                   u'alle sm\xf8rrebr\xf8dsrestauranter i K\xf8benhavn .. (Du'
+                   u' kan l\xe6se de andre her p\xe5 siden'})
 
 
 def test_get_number_of_pages():
