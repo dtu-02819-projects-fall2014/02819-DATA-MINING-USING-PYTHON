@@ -57,7 +57,7 @@ def run(term, location, search_limit, city, filter_state, drop_db=True,
 
 def partition(l, n):
     """
-    Will yield a generator that can be used to partition a list in a list of
+    Will create a generator that can be used to partition a list in a list of
     lists with the same amount of elements in each inner list. In case of a
     partitionning that do not add up with the length of the list, the rest will
     be addes as the last elements in the outer list.
