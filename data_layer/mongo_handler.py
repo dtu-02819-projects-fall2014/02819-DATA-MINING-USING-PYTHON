@@ -20,8 +20,6 @@ class YelpMongoHandler():
         elif collection == 'places':
             return self.db.places
 
-#        elif collection == 'users_id':
-#            return self.db.users_id
 
         elif collection == 'frontend_users':
             return self.db.frontend_users

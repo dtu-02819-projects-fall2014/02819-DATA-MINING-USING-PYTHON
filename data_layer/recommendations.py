@@ -2,21 +2,6 @@
 from math import sqrt
 
 
-# Returns a distance-based similarity score for person1 and person2
-def sim_distance(prefs,person1,person2):
-  # Get the list of shared_items
-  si={}
-  for item in prefs[person1]: 
-    if item in prefs[person2]: si[item]=1
-
-  # if they have no ratings in common, return 0
-  if len(si)==0: return 0
-
-  # Add up the squares of all the differences
-  sum_of_squares=sum([pow(prefs[person1][item]-prefs[person2][item],2) 
-                      for item in prefs[person1] if item in prefs[person2]])
-
-  return 1/(1+sum_of_squares)
 
 # Returns the Pearson correlation coefficient for p1 and p2
 def sim_pearson(prefs,p1,p2):
@@ -50,15 +35,6 @@ def sim_pearson(prefs,p1,p2):
   r=num/den
 
   return r
-
-# Returns the best matches for person from the prefs dictionary. 
-# Number of results and similarity function are optional params.
-def topMatches(prefs,person,n=5,similarity=sim_pearson):
-  scores=[(similarity(prefs,person,other),other) 
-                  for other in prefs if other!=person]
-  scores.sort()
-  scores.reverse()
-  return scores[0:n]
 
 # Gets recommendations for a person by using a weighted average
 # of every other user's rankings
