@@ -62,6 +62,25 @@ def run(term, location, search_limit, city, filter_state, drop_db=True,
     map(functools.partial(
         handler.add_document, collection='users_info'), scraper.users)
 
+
+def partition(l, n):
+    """
+    Will yield a generator that can be used to partition a list in a list of
+    lists with the same amount of elements in each inner list. In case of a
+    partitionning that do not add up with the length of the list, the rest will
+    be addes as the last elements in the outer list.
+
+    Args:
+        l (list): The list that should be partitioned
+        n (int): The number of chunks to partitioning the list in
+
+    yield:
+        A generator use to partion
+    """
+
+    for i in xrange(0, len(l), n):
+        yield l[i:i+n]
+
 if __name__ == '__main__':
     try:
         term = sys.argv[1]
