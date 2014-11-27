@@ -6,6 +6,7 @@ import configure_yelp_api
 import data_layer.restaurant_scraper as place_scraper
 import data_layer.user_scraper as user_scraper
 import data_layer.mongo_handler as mongo_handler
+from data_layer.yelp_json import YelpApiError
 
 
 def run(term, location, search_limit, city, filter_state, drop_db=True,
@@ -41,26 +42,17 @@ def run(term, location, search_limit, city, filter_state, drop_db=True,
     users = place_scraper.scrap_users(url_search_list)
     userList = [user for user in users]
 
-    len_u = len(userList)/num_of_scraps
+    # This fixes the memory issues with the amazon server, by splitting the
+    # users up in sub lists
+    partitioned_userList = list(partition(userList, num_of_scraps))
 
-    n = 0
-
-    for i in xrange(len_u):
-        n = i*num_of_scraps
+    for inner_list in partitioned_userList:
         scraper = user_scraper.UserScraper()
-        scraper.scrap_users(city, filter_state, userList[n:n+num_of_scraps])
+        scraper.scrap_users(city, filter_state, inner_list)
         map(functools.partial(
             handler.add_document, collection='places'), scraper.places)
         map(functools.partial(
             handler.add_document, collection='users_info'), scraper.users)
-
-    scraper = user_scraper.UserScraper()
-    scraper.scrap_users(city, filter_state, userList[n+num_of_scraps:])
-
-    map(functools.partial(
-        handler.add_document, collection='places'), scraper.places)
-    map(functools.partial(
-        handler.add_document, collection='users_info'), scraper.users)
 
 
 def partition(l, n):
@@ -105,8 +97,11 @@ if __name__ == '__main__':
         elif len(sys.argv) is 9:
             run(term, location, search_limit, city,
                 filter_state, drop_db, port, host)
-
     except IndexError:
         print('Arguments should be: \n <term> <location> <search_limit> '
               '<city> <filter_state> <drop_db> (defualt: True) '
               '<port> (default: 27017) <host> (default: localhost)')
+    except YelpApiError as e:
+        print e
+    except Exception as e1:
+        print e1
