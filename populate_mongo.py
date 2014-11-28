@@ -1,16 +1,26 @@
 # -*- coding: utf-8 -*-
 
+"""
+Usage:
+    populate_mongo.py <term> <location> <search_limit> <city> <filter_state>
+    populate_mongo.py <term> <location> <search_limit> <city> <filter_state> <num_of_scraps>
+    populate_mongo.py <term> <location> <search_limit> <city> <filter_state> <num_of_scraps> <drop_db>
+    populate_mongo.py <term> <location> <search_limit> <city> <filter_state> <num_of_scraps> <drop_db> <port>
+    populate_mongo.py <term> <location> <search_limit> <city> <filter_state> <num_of_scraps> <drop_db> <port> <host>
+"""
+
 import functools
-import sys
 import configure_yelp_api
 import data_layer.restaurant_scraper as place_scraper
 import data_layer.user_scraper as user_scraper
 import data_layer.mongo_handler as mongo_handler
 from data_layer.yelp_json import YelpApiError
+from pymongo.errors import ConnectionFailure
+from docopt import docopt
 
 
-def run(term, location, search_limit, city, filter_state, drop_db=True,
-        port=27017, host='localhost', num_of_scraps=5):
+def run(term, location, search_limit, city, filter_state, num_of_scraps=5,
+        drop_db=True, port=27017, host='localhost'):
     """
     Populates the specified mongodb
 
@@ -21,11 +31,13 @@ def run(term, location, search_limit, city, filter_state, drop_db=True,
         city (str): Specify which city the place and reviews has to come
         from to be scrapped
         filter_state (str): The Yelp fiter state, e.g. København is
-        '84', paris is '75', New York is 'NY
+        '84', paris is '75', New York is 'NY'
 
     Kwargs:
+        num_of_scraps (int): Default 5, defines the number of user that is being
+        scraped at a time.
         drop_db (bool): Default true, will drop db collections
-        port (str): Default mongodb port, change to use other port
+        port (int): Default mongodb port, change to use other port
         host (str): Change to your server
     """
 
@@ -73,35 +85,50 @@ def partition(l, n):
     for i in xrange(0, len(l), n):
         yield l[i:i+n]
 
+
+def to_bool(s):
+    """
+    Converts the string 'true' to the bool type True and the string 'false'
+    to False. This is done with both upper and lower case strings.
+
+    Args:
+        s (str): The string to convert
+
+    Return:
+        The bool evaluation of the string, of type bool
+    """
+
+    return s.lower() == 'true'
+
 if __name__ == '__main__':
     try:
-        term = sys.argv[1]
-        location = sys.argv[2]
-        search_limit = int(sys.argv[3])
-        city = unicode(sys.argv[4], 'utf-8')
-        filter_state = sys.argv[5]
-        if len(sys.argv) > 6:
-            drop_db = bool(sys.argv[6])
-        elif len(sys.argv) > 7:
-            port = int(sys.argv[7])
-        elif len(sys.argv) > 8:
-            host = sys.argv[8]
+        args = docopt(__doc__, version='populate_mongo 1.0')
+        term = args['<term>']
+        location = args['<location>']
+        search_limit = int(args['<search_limit>'])
+        city = unicode(args['<city>'], 'utf-8')
+        filter_state = args['<filter_state>']
 
-        if len(sys.argv) is 6:
+        if args['<host>'] is not None:
+            run(term, location, search_limit, city, filter_state,
+                int(args['<num_of_scraps>']), to_bool(args['<drop_db>']),
+                int(args['<port>']), args['<host>'])
+        elif args['<port>'] is not None:
+            run(term, location, search_limit, city, filter_state,
+                int(args['<num_of_scraps>']), to_bool(args['<drop_db>']),
+                int(args['<port>']))
+        elif args['<drop_db>'] is not None:
+            run(term, location, search_limit, city, filter_state,
+                int(args['<num_of_scraps>']), to_bool(args['<drop_db>']))
+        elif args['<num_of_scraps>'] is not None:
+            run(term, location, search_limit, city, filter_state,
+                int(args['<num_of_scraps>']))
+        else:
             run(term, location, search_limit, city, filter_state)
-        elif len(sys.argv) is 7:
-            run(term, location, search_limit, city, filter_state, drop_db)
-        elif len(sys.argv) is 8:
-            run(term, location, search_limit, city,
-                filter_state, drop_db, port)
-        elif len(sys.argv) is 9:
-            run(term, location, search_limit, city,
-                filter_state, drop_db, port, host)
-    except IndexError:
-        print('Arguments should be: \n <term> <location> <search_limit> '
-              '<city> <filter_state> <drop_db> (defualt: True) '
-              '<port> (default: 27017) <host> (default: localhost)')
+
     except YelpApiError as e:
         print e
-    except Exception as e1:
-        print e1
+    except ConnectionFailure as e1:
+        print '{} check MongoDB connection'.format(e1)
+    except Exception as e2:
+        print e2
