@@ -12,7 +12,8 @@ app = Flask(__name__, static_url_path = '/static')
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    db_infos = { 'number_of_places': len(helper_functions.get_places()), 'number_of_users': helper_functions.get_number_of_users() }
+    return render_template('index.html', db_infos = db_infos)
 
 
 
@@ -53,6 +54,7 @@ def by_user_name( sug_count = 5):
     name = None
     error = None
     suggestions = None
+    
 
     if request.method == 'POST':
         name = str(request.form['name'])

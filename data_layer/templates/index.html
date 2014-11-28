@@ -65,7 +65,24 @@
       </div>
 
     </div>
+
     
+   
+    <div class="container">
+      <div class="columns four feature" >
+	{% for info in db_infos.keys() %}
+	{{ info }}: {{ db_infos[info] }}
+	{% endfor %}
+
+      </div>
+
+
+      <div class="twelve columns feature">
+	
+      </div>
+
+    </div>
+
 
   </body>
 </html>
