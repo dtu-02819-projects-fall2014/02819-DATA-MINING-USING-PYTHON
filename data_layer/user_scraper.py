@@ -44,7 +44,7 @@ class UserScraper:
 
         for user_id in users_ids:
             print('Start downlaoding user {0}'.format(user_id))
-
+            self.__sleep_rand()
             soup = self.soup_reviews_by_filter(user_id, 0, city, filter_state)
 
             page_interval = self.get_number_of_pages(soup)
@@ -85,7 +85,7 @@ class UserScraper:
         """
         Makes the thread sleep a few seconds
         """
-        a = random.uniform(40, 60)
+        a = random.uniform(150, 300)
         time.sleep(a)
 
     def __scrap_users_places(self):
