@@ -83,9 +83,9 @@
 
       <div class="five columns feature"  >
 	
-	<form action="/user/" method="Post" >
+	<form action="/user/{{ count }}" method="Post" >
 	 
-	  <input type="text"  name="name" value="user">
+	  <input type="text"  name="name" value="">
 	 
 	  <div id="submit-button">
 	    <input type="submit" value="Get your suggestion!">
@@ -112,6 +112,19 @@
     {% if error %}
     <div style="margin-top:50px" class="sixteen columns container" >
       <h4>{{ error }}</h4>
+    </div>
+    {% endif %}
+
+    {% if users %}
+    <div class="container">
+      <div style="margin-top:50px" class="four columns" >
+	<p> Some user names present in db: </p>
+	{% for u in users %}
+	{{ u }} - 
+	{% endfor %}
+      </div>
+      <div class="columns twelve feature" >
+      </div>
     </div>
     {% endif %}
 

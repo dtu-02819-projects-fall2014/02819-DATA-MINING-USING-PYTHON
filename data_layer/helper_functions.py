@@ -2,6 +2,7 @@ import mongo_handler
 import recommendations
 import datetime
 import functools
+from random import shuffle
 
 handler = mongo_handler.YelpMongoHandler()
 
@@ -27,9 +28,18 @@ def add_ratings_to_db(values):
     return _return
 
 
-def get_places():
-    
-    return handler.get_documents('places')
+def get_some_places(count):
+    places = handler.get_documents('places')
+    shuffle(places)
+    places = places[:min(int(count),20)]
+    return places
+
+def get_some_user_names(count = 5):
+    users = handler.get_documents('users_info')
+    shuffle(users)
+    users = users[:min(int(count),20)]
+    return [u['name'] for u in users]
+
 
 
 def get_number_of_users():

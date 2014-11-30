@@ -3,7 +3,6 @@ import json
 import yelp_json
 # from user_scraper import get_user
 from flask import render_template, url_for, request
-from random import shuffle
 import helper_functions
 
 app = Flask(__name__, static_url_path = '/static')
@@ -19,8 +18,7 @@ def home():
 
 @app.route('/ratings/',methods = ['POST', 'GET'])
 @app.route('/ratings/<count>',methods = ['POST', 'GET'])
-@app.route('/ratings/<count>/<sug_count>',methods = ['POST', 'GET'])
-def by_ratings(count=5, sug_count=5):
+def by_ratings(count=5):
 
     places = None
     suggestions = None
@@ -28,9 +26,7 @@ def by_ratings(count=5, sug_count=5):
     error = None
 
     if request.method == 'GET':
-        places = helper_functions.get_places()
-        shuffle(places)
-        places=places[:min(int(count),20)]
+        places = helper_functions.get_some_places(count)
 
     if request.method == 'POST':
         #values of form [ ( place_id, rating ), ... ]
@@ -40,30 +36,33 @@ def by_ratings(count=5, sug_count=5):
         log = helper_functions.add_ratings_to_db(values)
         
         try :
-            suggestions =  helper_functions.get_suggestions_ratings(log['_id']) [:sug_count]
+            suggestions =  helper_functions.get_suggestions_ratings(log['_id']) [:count]
         except Exception as e:
             error = str(e)
 
     return render_template('ratings.html', places=places,
-                           suggestions=suggestions, log=log, error=error)
+                           suggestions=suggestions, log=log, error=error, count=count)
 
 
 @app.route('/user/',methods = ['POST', 'GET'])
-@app.route('/user/<sug_count>',methods = ['POST', 'GET'])
-def by_user_name( sug_count = 5):
+@app.route('/user/<count>',methods = ['POST', 'GET'])
+def by_user_name( count = 5):
     name = None
     error = None
     suggestions = None
-    
+    users = None
+ 
+    if request.method == 'GET':
+        users = helper_functions.get_some_user_names()
 
     if request.method == 'POST':
         name = str(request.form['name'])
         try :
-            suggestions = helper_functions.get_suggestions_username(name) [:sug_count]
+            suggestions = helper_functions.get_suggestions_username(name) [:count]
         except Exception as e:
             error = str(e)
             
-    return render_template('user.html', name=name, suggestions = suggestions, error = error)
+    return render_template('user.html', name=name, suggestions = suggestions, error = error, users=users, count=count)
 
 
 
