@@ -303,13 +303,14 @@ class UserScraper:
         Return:
             A dict object with 'price', and 'categories' as keys
         """
-        price_category_list = soup_snippet.find(
-            'div', class_='price-category').get_text().split('\n')
-
-        # clean up the list
-        price_category_list = [i for i in price_category_list if i is not u'']
-
         try:
+            price_category_list = soup_snippet.find(
+                'div', class_='price-category').get_text().split('\n')
+
+            # clean up the list
+            price_category_list = [i for i in
+                                   price_category_list if i is not u'']
+
             category_index = 0 if len(price_category_list) is 1 else 1
 
             price_category_list[category_index] = [
@@ -323,7 +324,7 @@ class UserScraper:
                 return {'price': price_category_list[0],
                         'categories': price_category_list[category_index]}
 
-        except IndexError:
+        except (IndexError, AttributeError):
             return {'price': None,
                     'categories': None}
 
