@@ -46,6 +46,10 @@ def get_number_of_users():
     
     return len(handler.get_documents('users_info')) + len(handler.get_documents('frontend_users'))
 
+def get_number_of_places():
+    
+    return len(handler.get_documents('places'))
+
         
 def get_suggestions_ratings(_id):
 
