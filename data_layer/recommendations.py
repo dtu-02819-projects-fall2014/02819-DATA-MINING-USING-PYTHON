@@ -1,10 +1,16 @@
+# -*- coding: utf-8 -*-
+
+ """
+ The code containing the recomendations algorithm. This code is copied from 
+ 'Programming Collective Intelligence' by Toby Segaran Chapter 2.
+
+ """
 
 from math import sqrt
 
-
-
 # Returns the Pearson correlation coefficient for p1 and p2
 def sim_pearson(prefs,p1,p2):
+
   # Get the list of mutually rated items
   si={}
   for item in prefs[p1]: 

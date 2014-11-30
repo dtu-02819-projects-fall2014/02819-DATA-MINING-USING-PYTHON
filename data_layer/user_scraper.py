@@ -10,7 +10,6 @@ class UserScraper:
     """
     The UserScraper class includes tools for scraping the Yelp users places and
     the review of those. After class instantiation, run the srap_users method
-    import populate_db
     with a list of user ids. Afterwords you will be able to get a list
     containing dictionaries of places the users have visited and a list
     containing dictionaries with the users and the reviews.
