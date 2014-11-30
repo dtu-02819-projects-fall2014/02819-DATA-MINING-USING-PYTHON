@@ -11,7 +11,7 @@ app = Flask(__name__, static_url_path = '/static')
 
 @app.route('/')
 def home():
-    db_infos = { 'number_of_places': len(helper_functions.get_number_of_places()), 'number_of_users': helper_functions.get_number_of_users() }
+    db_infos = { 'number_of_places': helper_functions.get_number_of_places(), 'number_of_users': helper_functions.get_number_of_users() }
     return render_template('index.html', db_infos = db_infos)
 
 
