@@ -111,6 +111,7 @@ def get_suggestions_ratings(_id):
     
     Args:
         _id (str): The id of an anonym user
+   
     Return:
         The suggestions for an anonym user
 
@@ -128,15 +129,18 @@ def get_suggestions_username(name):
     
     Args:
         name (str): The name of a yelp user in the database
+    
     Return:
         The suggestions for a yelp user
 
+    Raise:
+        An Exception when the user is not in the data base
     """
     
     user =  handler.get_documents('users_info',one=True, query={'name' : name}) 
 
     if not user:
-        raise NameError("No user found with the name %s"%(name))
+        raise Exception("No user found with the name %s"%(name))
 
     return _suggestions(user)
 
