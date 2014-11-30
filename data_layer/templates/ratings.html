@@ -84,7 +84,7 @@
 
 	<h2>Ratings</h2>
 	<h4>12345</h4>
-	<form action="/ratings/{{ count }}" method="Post" >
+	<form action="/ratings/{{ count }}/{{ sug_count }}" method="Post" >
 	  {% for p in places %}
 	  <div class="radio-buttons">
 	    <input type="radio" name="{{ p['_id'] }}" value="1" checked>

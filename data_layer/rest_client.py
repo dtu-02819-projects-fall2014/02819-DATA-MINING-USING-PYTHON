@@ -18,7 +18,8 @@ def home():
 
 @app.route('/ratings/',methods = ['POST', 'GET'])
 @app.route('/ratings/<count>',methods = ['POST', 'GET'])
-def by_ratings(count=5):
+@app.route('/ratings/<count>/<sug_count>',methods = ['POST', 'GET'])
+def by_ratings(count=5, sug_count = 5):
 
     places = None
     suggestions = None
@@ -29,6 +30,8 @@ def by_ratings(count=5):
         places = helper_functions.get_some_places(count)
 
     if request.method == 'POST':
+        count = int(count)
+        sug_count = int(sug_count)
         #values of form [ ( place_id, rating ), ... ]
         values = request.form.items()
 
@@ -36,17 +39,17 @@ def by_ratings(count=5):
         log = helper_functions.add_ratings_to_db(values)
         
         try :
-            suggestions =  helper_functions.get_suggestions_ratings(log['_id']) [:count]
+            suggestions =  helper_functions.get_suggestions_ratings(log['_id']) [:sug_count]
         except Exception as e:
             error = str(e)
 
     return render_template('ratings.html', places=places,
-                           suggestions=suggestions, log=log, error=error, count=count)
+                           suggestions=suggestions, log=log, error=error, count=count, sug_count=sug_count)
 
 
 @app.route('/user/',methods = ['POST', 'GET'])
-@app.route('/user/<count>',methods = ['POST', 'GET'])
-def by_user_name( count = 5):
+@app.route('/user/<sug_count>',methods = ['POST', 'GET'])
+def by_user_name( sug_count = 5):
     name = None
     error = None
     suggestions = None
@@ -56,13 +59,14 @@ def by_user_name( count = 5):
         users = helper_functions.get_some_user_names()
 
     if request.method == 'POST':
+        sug_count = int(sug_count)
         name = str(request.form['name'])
         try :
-            suggestions = helper_functions.get_suggestions_username(name) [:count]
+            suggestions = helper_functions.get_suggestions_username(name) [:sug_count]
         except Exception as e:
             error = str(e)
             
-    return render_template('user.html', name=name, suggestions = suggestions, error = error, users=users, count=count)
+    return render_template('user.html', name=name, suggestions = suggestions, error = error, users=users, sug_count=sug_count)
 
 
 
