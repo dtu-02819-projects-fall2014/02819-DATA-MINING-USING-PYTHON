@@ -19,7 +19,7 @@ def home():
 @app.route('/ratings/',methods = ['POST', 'GET'])
 @app.route('/ratings/<count>',methods = ['POST', 'GET'])
 @app.route('/ratings/<count>/<sug_count>',methods = ['POST', 'GET'])
-def by_ratings(count=5, sug_count = 5):
+def by_ratings(count=5, sug_count = 15):
 
     places = None
     suggestions = None
@@ -49,7 +49,7 @@ def by_ratings(count=5, sug_count = 5):
 
 @app.route('/user/',methods = ['POST', 'GET'])
 @app.route('/user/<sug_count>',methods = ['POST', 'GET'])
-def by_user_name( sug_count = 5):
+def by_user_name( sug_count = 15):
     name = None
     error = None
     suggestions = None

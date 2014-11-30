@@ -40,7 +40,8 @@ def _reduce_reviews(collection = 'users_info'):
         raise Exception('collection argument has to be users_info or frontend_users')
 
     handler = mongo_handler.YelpMongoHandler()
-    number_of_deleted = 0
+    reviews_deleted = 0
+    users_deleted = 0
     for u in handler.get_documents(collection):
         reviews = []
         for r in u['reviews']:
@@ -48,11 +49,16 @@ def _reduce_reviews(collection = 'users_info'):
             if  handler.get_documents('places', query={'_id':_id}, one=True):
                 reviews.append(r)
             else:
-                number_of_deleted +=1
+                reviews_deleted +=1
 
-        u['reviews'] = reviews
-        handler.add_document(u, collection, update=True)
-    return number_of_deleted
+        if len(reviews) == 0:
+            handler.remove(collection, {'_id':u['_id']}, multiple=False)
+            users_deleted +=1
+        else:
+            u['reviews'] = reviews
+            handler.add_document(u, collection, update=True)
+
+    return {'reviews_deleted': reviews_deleted, 'users_deleted': users_deleted}  
 
 if __name__ == '__main__':
 
@@ -65,7 +71,7 @@ if __name__ == '__main__':
         else:
           print s, _reduce_places()
           
-        s2 = 'number of deleted reviews in collection'
+        s2 = 'infos in collection'
         print s2, 'users_info:', _reduce_reviews()
         print s2, 'frontend_users:', _reduce_reviews(collection='frontend_users')
 
