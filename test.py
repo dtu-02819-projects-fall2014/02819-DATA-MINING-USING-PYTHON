@@ -9,7 +9,7 @@ import data_layer.restaurant_scraper as restaurant_scraper
 
 # initial setup for testing the UserScraper
 
-# use a downloaded html page to test on
+# use a downloaded html pages to test on
 url_path_page = os.path.abspath('test_data/yelp_test_page.html')
 url_path_user = os.path.abspath('test_data/yelp_profile_test_page.html')
 url_path_empty = os.path.abspath('test_data/yelp_empty_user_test.html')
@@ -64,6 +64,10 @@ def test_extract_address():
                   {'address': u'Esplanaden 4'})
 
 
+def test_extract_address_empty():
+    assert_equals(scraper.extract_address(test_soup_empty), {'address': ''})
+
+
 def test_extract_information():
     assert_equals(scraper.extract_information(test_soup_page),
                   {'url': u'http://www.yelp.dk'
@@ -87,6 +91,12 @@ def test_extract_price_and_category_no_price():
     assert_equals(scraper.extract_price_and_category(test_soup_no_price),
                   {'price': None,
                   'categories': [u'Ice Cream & Frozen Yogurt']})
+
+
+def test_extract_price_and_category_empty():
+    assert_equals(scraper.extract_price_and_category(test_soup_empty),
+                  {'price': None,
+                   'categories': None})
 
 
 def test_extract_rating():
