@@ -32,8 +32,7 @@ def reduce_places(min_mentionned=2):
     number_of_deleted = 0
     for _id in places.keys():
         if places[_id] < min_mentionned:
-            handler.remove('places', {'_id': _id }, multiple=False)
-            if d['n'] > 0:
+            if handler.remove('places', {'_id': _id }, multiple=False)['n'] > 0:
                 number_of_deleted +=1
 
     return number_of_deleted
