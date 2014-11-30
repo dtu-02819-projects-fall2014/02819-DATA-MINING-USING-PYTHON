@@ -13,10 +13,8 @@ import mongo_handler
 from docopt import docopt
 from pymongo.errors import ConnectionFailure
 
-def reduce_places(min_mentionned=2):
+def _reduce_places(min_mentionned=2):
     
-
-
     handler = mongo_handler.YelpMongoHandler()
 
     places = {}
@@ -37,15 +35,39 @@ def reduce_places(min_mentionned=2):
 
     return number_of_deleted
 
+def _reduce_reviews(collection = 'users_info'):
+    if collection is not 'users_info' and not 'frontend_users':
+        raise Exception('collection argument has to be users_info or frontend_users')
+
+    handler = mongo_handler.YelpMongoHandler()
+    number_of_deleted = 0
+    for u in handler.get_documents(collection):
+        reviews = {}
+        for r in u['reviews']:
+            _id = r['_id']
+            if  handler.get_documents('places', query={'_id':_id}, one=True):
+                reviews.append(r)
+            else:
+                number_of_deleted +=1
+
+        u['reviews'] = reviews
+        handler.add_document(u, collection, update=True)
+    return number_of_deleted
+
 if __name__ == '__main__':
 
     try:
         args = docopt(__doc__, version='reduce_db 1.0')
          
+        s = 'number of deleted places'
         if args['<min_mentionned>'] is not None:
-          print reduce_places(min_mentionned=int(args['<min_mentionned>']))
+          print s, _reduce_places(min_mentionned=int(args['<min_mentionned>']))
         else:
-          print reduce_places()
+          print s, _reduce_places()
+          
+        s2 = 'number of deleted reviews in collection'
+        print s2, 'users_info:', _reduce_reviews()
+        print s2, 'frontend_users:', _reduce_reviews(collection='frontend_users')
 
     except ConnectionFailure as e1:
         print '{} check MongoDB connection'.format(e1)
