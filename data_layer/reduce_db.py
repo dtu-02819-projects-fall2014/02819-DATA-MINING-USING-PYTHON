@@ -42,7 +42,7 @@ def _reduce_reviews(collection = 'users_info'):
     handler = mongo_handler.YelpMongoHandler()
     number_of_deleted = 0
     for u in handler.get_documents(collection):
-        reviews = {}
+        reviews = []
         for r in u['reviews']:
             _id = r['_id']
             if  handler.get_documents('places', query={'_id':_id}, one=True):
