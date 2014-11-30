@@ -37,20 +37,21 @@ class YelpMongoHandler():
         if '_id' not in doc.keys():
             raise Exception('document must have an id in form of "_id" ')
 
-        _return = {'_id': doc['_id'], 'updated': False, 'inserted': False}
-
-        if self.get_collection(collection).find_one(
-                {'_id': doc['_id']}) is not None:
+        m_collection = self.get_collection(collection)
+        _id = doc['_id']
+        return_value = {'_id': _id, 'updated': False, 'inserted': False}
+        if m_collection.find_one(
+                {'_id': _id}) is not None:
 
             if update:
-                self.get_collection(collection).update(
-                    {'_id': doc['_id']}, {"$set": doc})
-                _return['updated'] = True
+                m_collection.update(
+                    {'_id': _id}, {"$set": doc})
+                return_value['updated'] = True
         else:
-            self.get_collection(collection).insert(doc)
-            _return['inserted'] = True
+            m_collection.insert(doc)
+            return_value['inserted'] = True
 
-        return _return
+        return return_value
 
     def drop_collection(self, collection):
         """
@@ -60,3 +61,10 @@ class YelpMongoHandler():
             collection (str): The collection to drop
         """
         return self.get_collection(collection).drop()
+        
+
+    def remove(self, collection, query, multiple=True):
+        
+        return self.get_collection(collection).remove(query, multi=multiple)
+        
+    
