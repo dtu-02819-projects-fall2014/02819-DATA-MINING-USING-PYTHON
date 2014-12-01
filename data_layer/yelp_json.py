@@ -10,7 +10,8 @@ class YelpApiDataExtractor:
     """
     This class is based on the script the yelp links to in its torurial.
     The YelpApiDataExtractor, is a rewrite of this script, inorder to make
-    it simpler to interface with a more generel system.
+    it simpler to interface with a more generel system. The original script can
+    be found at https://github.com/Yelp/yelp-api/tree/master/v2/python
 
     The class is only considering businesses.
 

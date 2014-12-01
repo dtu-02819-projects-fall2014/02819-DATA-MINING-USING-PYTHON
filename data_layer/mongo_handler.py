@@ -5,11 +5,13 @@ import pymongo
 
 class YelpMongoHandler():
     """
-    The YelpMongoHandler class is a small Mongo handler for our project. It allows to access 
-    and modify the database more easily. It support the collections that we use, i.e. 
-    'users_info', 'places' and 'frontend_users'. The 'users_info' collection describes all the
-    scrapped users. The 'places' collection describes the scrapped places. The 'frontend_collection'
-    represent all the users created automatically from the web page.
+    The YelpMongoHandler class is a small Mongo handler for our project.
+    It allows to access and modify the database more easily. It support the
+    collections that we use, i.e. 'users_info', 'places' and 'frontend_users'.
+    The 'users_info' collection describes all the scrapped users.
+    The 'places' collection describes the scrapped places.
+    The 'frontend_collection' represent all the users created automatically
+    from the web page.
 
     Fields:
          db: the 'yelp_db' that contains the three above mentionned collections
@@ -20,19 +22,19 @@ class YelpMongoHandler():
         self.db = client.yelp_db
 
     def get_collection(self, collection):
-        
-         """
+        """
          Returns a collection according to the string passed in parameter
 
          Args:
              collection (str): The name of the desired collection
-         
+
          Return:
              One of the three collections according to the parameter
 
          Raise:
-             An exception if the collection parameter is not a string and not one of these values:
-             ['users_info', 'places', 'frontend_users'] 
+             An exception if the collection parameter is not a string and not
+             one of these values:
+             ['users_info', 'places', 'frontend_users']
          """
 
         if type(collection) is not str:
@@ -44,7 +46,6 @@ class YelpMongoHandler():
         elif collection == 'places':
             return self.db.places
 
-
         elif collection == 'frontend_users':
             return self.db.frontend_users
         else:
@@ -53,16 +54,18 @@ class YelpMongoHandler():
     def get_documents(self, collection, query={}, one=False):
         """
         The functions retrieves one or more documents of a collection
-        
+
         Args:
             collection (str): The name of the collection to get documents
 
         Kwargs:
-            query (dict): The query for the desired document. Is initial empty dict.
+            query (dict): The query for the desired document.
+            Is initial empty dict.
             one (bool): If True returns only one document. Is initial False.
-        
+
         Return:
-             A dict or a list of dicts according to the query and the given collection
+             A dict or a list of dicts according to the query and the
+             given collection
          """
 
         if one:
@@ -77,16 +80,17 @@ class YelpMongoHandler():
         Args:
             collection (str): The name of the collection where to add a document
             doc (dict): The document to add
-        
+
         Kwargs:
-            update (bool): if True will update an existing document. Is initial False.
+            update (bool): if True will update an existing document.
+            Is initial False.
         Return:
-             A dictionary with three fields: {'_id': (str), 'updated': (bool), 'inserted': (bool)}
+             A dictionary with three fields: {'_id': (str), 'updated': (bool),
+             'inserted': (bool)}
 
         Raise:
              An exception if the document has no '_id' field
         """
-
 
         if '_id' not in doc.keys():
             raise Exception('document must have an id in form of "_id" ')
@@ -113,10 +117,9 @@ class YelpMongoHandler():
 
         Args:
             collection (str): The collection to drop
-        
+
         """
         return self.get_collection(collection).drop()
-        
 
     def remove(self, collection, query, multiple=True):
         """
@@ -125,9 +128,10 @@ class YelpMongoHandler():
         Args:
             collection (str): The name of the desired collection
             query (dict): The query of the documents to remove
-        
+
         Kwargs:
-            multiple (bool): if False will remove only one document that matches the query. Is initial True.
+            multiple (bool): if False will remove only one document that matches
+            the query. Is initial True.
 
         Return:
              A dictionary with two fields: {'n': (int), 'ok': (int)}
