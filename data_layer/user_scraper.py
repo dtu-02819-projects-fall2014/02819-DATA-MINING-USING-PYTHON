@@ -85,7 +85,7 @@ class UserScraper:
         """
         Makes the thread sleep a few seconds
         """
-        a = random.uniform(1,5)
+        a = random.uniform(0.1,0.2)
         time.sleep(a)
 
     def __scrap_users_places(self):
