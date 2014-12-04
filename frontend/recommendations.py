@@ -5,9 +5,9 @@
  'Programming Collective Intelligence first edition' by Toby Segaran Chapter 2.
 
 """
-
-from math import sqrt
 from __future__ import division
+from math import sqrt
+
 # Returns the Pearson correlation coefficient for p1 and p2
 
 
