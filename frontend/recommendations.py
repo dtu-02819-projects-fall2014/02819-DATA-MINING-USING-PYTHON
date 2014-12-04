@@ -13,6 +13,7 @@ from math import sqrt
 
 def sim_pearson(prefs, p1, p2):
 
+    print '--'
     # Get the list of mutually rated items
     si = {}
     for item in prefs[p1]:
@@ -42,10 +43,13 @@ def sim_pearson(prefs, p1, p2):
     # Calculate r (Pearson score)
     num = pSum-(sum1*sum2/n)
     den = sqrt((sum1Sq-pow(sum1, 2)/n)*(sum2Sq-pow(sum2, 2)/n))
+    print num
+    print den 
     if den == 0:
         return 0
-
+    
     r = num/den
+
 
     return r
 
