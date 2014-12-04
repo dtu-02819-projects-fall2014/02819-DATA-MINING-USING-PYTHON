@@ -7,7 +7,7 @@
 """
 from __future__ import division
 from math import sqrt
-
+import pprint
 # Returns the Pearson correlation coefficient for p1 and p2
 
 
@@ -91,5 +91,6 @@ def getRecommendations(prefs, person, similarity=sim_pearson):
     # Return the sorted list
     rankings.sort()
     rankings.reverse()
-    print prefs
+    pp = pprint.PrettyPrinter(indent=4)
+    pp.pprint(prefs)
     return rankings
