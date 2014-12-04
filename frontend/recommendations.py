@@ -60,7 +60,7 @@ def getRecommendations(prefs, person, similarity=sim_pearson):
             continue
 
         sim = similarity(prefs, person, other)
-
+        print sim
         if sim <= 0:
             continue
 
