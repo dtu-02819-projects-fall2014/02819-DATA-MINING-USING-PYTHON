@@ -61,6 +61,7 @@ def sim_pearson(prefs, p1, p2):
 
 
 def getRecommendations(prefs, person, similarity=sim_pearson):
+
     totals = {}
     simSums = {}
     for other in prefs:
@@ -90,4 +91,5 @@ def getRecommendations(prefs, person, similarity=sim_pearson):
     # Return the sorted list
     rankings.sort()
     rankings.reverse()
+    print prefs
     return rankings
