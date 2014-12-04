@@ -7,7 +7,7 @@
 """
 
 from math import sqrt
-
+from __future__ import division
 # Returns the Pearson correlation coefficient for p1 and p2
 
 
