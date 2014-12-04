@@ -171,8 +171,8 @@ def _suggestions(user):
         An Excpetion if no suggestions are available.
     """
 
-    users = handler.get_documents('users_info')# + handler.get_documents(
-#        'frontend_users')
+    users = handler.get_documents('users_info') + handler.get_documents(
+        'frontend_users')
 
     prefs = {}
     for user in users:
