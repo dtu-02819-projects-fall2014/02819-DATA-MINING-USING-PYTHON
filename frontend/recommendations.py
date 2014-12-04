@@ -17,11 +17,11 @@ def sim_pearson(prefs, p1, p2):
     si = {}
     for item in prefs[p1]:
         if item in prefs[p2]:
-            print 'ok'
             si[item] = 1
 
     # if they are no ratings in common, return 0
     if len(si) == 0:
+        print 'sheat'
         return 0
 
     # Sum calculations
