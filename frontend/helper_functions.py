@@ -210,5 +210,5 @@ def _transform_for_suggestions(user):
 
     ratings = {}
     for r in user['reviews']:
-        ratings[r['_id']] = r['rating']
+        ratings[r['_id']] = float(r['rating'])
     return {user['_id']: ratings}
