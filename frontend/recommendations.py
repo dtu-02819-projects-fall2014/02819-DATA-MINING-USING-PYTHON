@@ -91,6 +91,7 @@ def getRecommendations(prefs, person, similarity=sim_pearson):
     # Return the sorted list
     rankings.sort()
     rankings.reverse()
+    log = open('log', 'w')
     pp = pprint.PrettyPrinter(indent=4, log)
     pp.pprint(prefs)
     return rankings
