@@ -25,7 +25,7 @@ def sim_pearson(prefs, p1, p2):
     if len(si) == 0:
         print 'sheat'
         return 0
-
+    print len(si)
     # Sum calculations
     n = len(si)
 
