@@ -32,14 +32,17 @@ def sim_pearson(prefs, p1, p2):
     # Sums of all the preferences
     sum1 = sum([prefs[p1][it] for it in si])
     sum2 = sum([prefs[p2][it] for it in si])
-
+    print 'sum1',sum1
+    print 'sum2',sum2
+    
     # Sums of the squares
     sum1Sq = sum([pow(prefs[p1][it], 2) for it in si])
     sum2Sq = sum([pow(prefs[p2][it], 2) for it in si])
-
+    print 'sum1Sq',sum1Sq
+    print 'sum2Sq',sum2Sq
     # Sum of the products
     pSum = sum([prefs[p1][it]*prefs[p2][it] for it in si])
-
+    print 'pSum',pSum
     # Calculate r (Pearson score)
     num = pSum-(sum1*sum2/n)
     den = sqrt((sum1Sq-pow(sum1, 2)/n)*(sum2Sq-pow(sum2, 2)/n))
