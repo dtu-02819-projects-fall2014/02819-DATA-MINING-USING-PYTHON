@@ -22,8 +22,8 @@ class UserScraper:
     def __init__(self):
         self.places = []
         self.users = []
-        self.__soups = {}
-        self.__soups_city = {}
+        self.soups = {}
+        self.soups_city = {}
         self.__place_record = set()
 
     def scrap_users(self, city, filter_state, users_ids):
