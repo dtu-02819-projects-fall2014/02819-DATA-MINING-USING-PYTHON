@@ -72,7 +72,7 @@ def sim_pearson(prefs, p1, p2):
 # of every other user's rankings
 
 
-def getRecommendations(prefs, person, similarity=sim_distance):
+def getRecommendations(prefs, person, similarity=sim_pearson):
 
     totals = {}
     simSums = {}
