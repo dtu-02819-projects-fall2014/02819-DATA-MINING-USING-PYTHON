@@ -131,14 +131,13 @@ def get_user_reviews(name):
 
     user = handler.get_documents('users_info', one=True, query={'name': name})
 
-    if not user:
-        return 
-        
-    ratings = {}
-    for r in user['reviews']:
-        ratings[r['name']] = float(r['rating'])
-    
-    return {user['name']: ratings}
+    if user:
+
+        ratings = {}
+        for r in user['reviews']:
+            ratings[r['name']] = float(r['rating'])
+            
+        return {user['name']: ratings}
 
 
 def get_suggestions_ratings(_id):
