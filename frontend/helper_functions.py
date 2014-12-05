@@ -181,8 +181,8 @@ def _suggestions(user):
         'frontend_users')
 
     prefs = {}
-    for user in users:
-        prefs.update(_transform_for_suggestions(user))
+    for u in users:
+        prefs.update(_transform_for_suggestions(u))
 
     reco_ids = recommendations.getRecommendations(prefs, user['_id'])
 
