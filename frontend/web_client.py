@@ -80,9 +80,12 @@ def by_ratings(count=5, sug_count=15):
         try:
             result = helper_functions.get_suggestions_username(
                 name)
+            suggestions = result[0][:sug_count]
+            log.update({'similarity distance method used':result[1]})
+    
         except Exception as e:
             error = str(e)
-        
+                
         suggestions = result[0][:sug_count]
         log.update({'similarity distance method used':result[1]})
 
@@ -131,14 +134,16 @@ def by_user_name(sug_count=15):
         name = str(request.form['name'])
         name = name.strip()
         log = helper_functions.get_user_reviews(name)
+
         try:
             result = helper_functions.get_suggestions_username(
                 name)
+            suggestions = result[0][:sug_count]
+            log.update({'similarity distance method used':result[1]})
+    
         except Exception as e:
             error = str(e)
-        
-        suggestions = result[0][:sug_count]
-        log.update({'similarity distance method used':result[1]})
+    
     return render_template('user.html', name=name, suggestions=suggestions,
                            error=error, users=users, log=log,
                            sug_count=sug_count)
