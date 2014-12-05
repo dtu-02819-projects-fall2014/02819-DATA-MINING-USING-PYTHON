@@ -196,13 +196,15 @@ def _suggestions(user):
     prefs = {}
     for u in users:
         prefs.update(_transform_for_suggestions(u))
-
+    
     reco_ids = recommendations.getRecommendations(prefs, user['_id'])
-
+    
     if not reco_ids:
+        print "euclidean"
         reco_ids = recommendations.getRecommendations(prefs, user['_id'],
         recommendations.sim_distance)
-        
+    else:
+        print "pearson"
     suggestions = []
     for score, place_id in reco_ids:
         place = handler.get_documents('places', one=True,
