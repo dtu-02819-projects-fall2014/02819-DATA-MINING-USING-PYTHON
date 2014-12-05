@@ -147,7 +147,7 @@ def get_suggestions_username(name):
     Raise:
         An Exception when the user is not in the data base
     """
-
+    name = name.strip()
     user = handler.get_documents('users_info', one=True, query={'name': name})
 
     if not user:
