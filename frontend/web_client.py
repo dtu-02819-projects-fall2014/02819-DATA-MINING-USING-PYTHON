@@ -78,8 +78,7 @@ def by_ratings(count=5, sug_count=15):
         log = helper_functions.add_ratings_to_db(values)
 
         try:
-            result = helper_functions.get_suggestions_username(
-                name)
+            result = helper_functions.get_suggestions_ratings(log['_id'])
             suggestions = result[0][:sug_count]
             log.update({'similarity distance method used':result[1]})
     

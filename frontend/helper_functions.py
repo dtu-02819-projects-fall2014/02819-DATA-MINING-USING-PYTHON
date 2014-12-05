@@ -117,23 +117,6 @@ def get_number_of_places():
     return len(handler.get_documents('places'))
 
 
-def get_suggestions_ratings(_id):
-    """
-    The function gives the suggestions from the ratings.
-
-    Args:
-        _id (str): The id of an anonym user
-
-    Return:
-        The suggestions for an anonym user
-
-    """
-
-    user = handler.get_documents('frontend_users', one=True, query={'_id': _id})
-
-    return _suggestions(user)
-
-
 def get_user_reviews(name):
     """
     The function gives the reviews from a user name.
@@ -152,6 +135,24 @@ def get_user_reviews(name):
         ratings[r['name']] = float(r['rating'])
     
     return {user['name']: ratings}
+
+
+def get_suggestions_ratings(_id):
+    """
+    The function gives the suggestions from the ratings.
+
+    Args:
+        _id (str): The id of an anonym user
+
+    Return:
+        The suggestions for an anonym user
+
+    """
+
+    user = handler.get_documents('frontend_users', one=True, query={'_id': _id})
+
+    return _suggestions(user)
+
 
 def get_suggestions_username(name):
     """
