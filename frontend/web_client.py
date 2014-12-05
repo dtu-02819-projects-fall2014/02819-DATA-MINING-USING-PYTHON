@@ -86,9 +86,6 @@ def by_ratings(count=5, sug_count=15):
         except Exception as e:
             error = str(e)
                 
-        suggestions = result[0][:sug_count]
-        log.update({'similarity distance method used':result[1]})
-
     return render_template('ratings.html', places=places,
                            suggestions=suggestions,
                            log=log,
