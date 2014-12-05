@@ -139,7 +139,7 @@
     <div class="container">
       <div style="margin-top:50px" class="six columns" >
 	<p>Infos about similarity method used and previews review: </p>
-	{{ log }}
+	{% for l in log.items() %} {{ l }} {% endfor %}
       </div>
       <div class="columns ten feature" >
       </div>
