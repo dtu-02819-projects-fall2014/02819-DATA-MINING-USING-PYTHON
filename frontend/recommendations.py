@@ -7,22 +7,25 @@
 """
 
 from math import sqrt
-import pprint
 # Returns the Pearson correlation coefficient for p1 and p2
 
 
 # Returns a distance-based similarity score for person1 and person2
-def sim_distance(prefs,person1,person2):
+def sim_distance(prefs, person1, person2):
     # Get the list of shared_items
-    si={}
+    si = {}
     for item in prefs[person1]:
-        if item in prefs[person2]: si[item]=1
+        if item in prefs[person2]:
+            si[item] = 1
         # if they have no ratings in common, return 0
-        if len(si)==0: return 0
+        if len(si) == 0:
+            return 0
         # Add up the squares of all the differences
-        sum_of_squares=sum([pow(prefs[person1][item]-prefs[person2][item],2)
-                            for item in prefs[person1] if item in prefs[person2]])
+        sum_of_squares = sum([pow(prefs[person1][item]-prefs[person2][item], 2)
+                              for item in prefs[person1] if item in
+                              prefs[person2]])
         return 1/(1+sum_of_squares)
+
 
 def sim_pearson(prefs, p1, p2):
 
@@ -42,7 +45,7 @@ def sim_pearson(prefs, p1, p2):
     # Sums of all the preferences
     sum1 = sum([prefs[p1][it] for it in si])
     sum2 = sum([prefs[p2][it] for it in si])
-    
+
     # Sums of the squares
     sum1Sq = sum([pow(prefs[p1][it], 2) for it in si])
     sum2Sq = sum([pow(prefs[p2][it], 2) for it in si])
@@ -55,9 +58,8 @@ def sim_pearson(prefs, p1, p2):
 
     if den == 0:
         return 0
-    
-    r = num/den
 
+    r = num/den
 
     return r
 

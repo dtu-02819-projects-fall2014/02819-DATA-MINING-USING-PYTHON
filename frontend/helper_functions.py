@@ -125,7 +125,8 @@ def get_user_reviews(name):
         name (dict): a yelp user in the database
 
     Return:
-        A dictionary discribing the reviews for a yelp user if it exist in the db
+        A dictionary discribing the reviews for a yelp user if it exist in the
+        db
 
     """
 
@@ -134,7 +135,7 @@ def get_user_reviews(name):
     ratings = {}
     for r in user['reviews']:
         ratings[r['name']] = float(r['rating'])
-            
+
     return {user['name']: ratings}
 
 
@@ -151,13 +152,14 @@ def _get_user_by_name(name):
     Raise:
         An Exception if the user is not in the db
     """
-    
+
     user = handler.get_documents('users_info', one=True, query={'name': name})
-    
+
     if not user:
         raise Exception("No user found with the name %s" % (name))
 
     return user
+
 
 def get_suggestions_ratings(_id):
     """
@@ -211,15 +213,15 @@ def _suggestions(user):
     prefs = {}
     for u in users:
         prefs.update(_transform_for_suggestions(u))
-    
+
     reco_ids = recommendations.getRecommendations(prefs, user['_id'])
     method = "pearson"
-    #if no recommendation found with pearson sim 
-    #distance we use the euclidean instead
+    # if no recommendation found with pearson sim
+    # distance we use the euclidean instead
     if not reco_ids:
         method = "euclidean"
-        reco_ids = recommendations.getRecommendations(prefs,
-                user['_id'], recommendations.sim_distance)
+        reco_ids = recommendations.getRecommendations(
+            prefs, user['_id'], recommendations.sim_distance)
 
     suggestions = []
     for score, place_id in reco_ids:
@@ -230,7 +232,7 @@ def _suggestions(user):
 
     if not suggestions:
         raise Exception("No suggestions available")
-   
+
     return (suggestions, method)
 
 
