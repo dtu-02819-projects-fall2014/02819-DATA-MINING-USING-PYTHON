@@ -198,16 +198,14 @@ def _suggestions(user):
         prefs.update(_transform_for_suggestions(u))
     
     reco_ids = recommendations.getRecommendations(prefs, user['_id'])
-    
+    method = "pearson"
     #if no recommendation found with pearson sim 
     #distance we use the euclidean instead
     if not reco_ids:
         method = "euclidean"
         reco_ids = recommendations.getRecommendations(prefs,
                 user['_id'], recommendations.sim_distance)
-    else:
-        method = "pearson"
-    
+
     suggestions = []
     for score, place_id in reco_ids:
         place = handler.get_documents('places', one=True,
@@ -218,7 +216,7 @@ def _suggestions(user):
     if not suggestions:
         raise Exception("No suggestions available")
    
-    return (suggestions, sim_method)
+    return (suggestions, method)
 
 
 def _transform_for_suggestions(user):
