@@ -125,17 +125,14 @@ def get_user_reviews(name):
         name (dict): a yelp user in the database
 
     Return:
-        A dictionary discribing the reviews for a yelp user
-
-    Raise:
-        An Exception when the user is not in the data base
+        A dictionary discribing the reviews for a yelp user if it exist in the db
 
     """
 
     user = handler.get_documents('users_info', one=True, query={'name': name})
 
     if not user:
-        raise Exception("No user found with the name %s" % (name))
+        return 
         
     ratings = {}
     for r in user['reviews']:
