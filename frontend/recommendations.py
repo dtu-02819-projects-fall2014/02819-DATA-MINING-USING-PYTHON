@@ -82,7 +82,6 @@ def getRecommendations(prefs, person, similarity=sim_distance):
             continue
 
         sim = similarity(prefs, person, other)
-        print sim
         if sim <= 0:
             continue
 
