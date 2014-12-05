@@ -131,9 +131,10 @@ def by_user_name(sug_count=15):
         name = str(request.form['name'])
         name = name.strip()
 
-        log = helper_functions.get_user_reviews(name)
+
         
         try:
+            log = helper_functions.get_user_reviews(name)
             result = helper_functions.get_suggestions_username(
                 name)
             suggestions = result[0][:sug_count]
