@@ -91,7 +91,7 @@ def _reduce_reviews(collection='users_info'):
 
         # if less than 2 reviews left for the user, then it has to be deleted
         #pearson correlation works only with at least 2 item matches
-        if len(reviews) < 2:
+        if len(reviews) < 5 or len(reviews) > 10:
             handler.remove(collection, {'_id': u['_id']}, multiple=False)
             users_deleted += 1
         # else we update the user with his reduced list of reviews

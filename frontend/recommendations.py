@@ -5,7 +5,7 @@
  'Programming Collective Intelligence first edition' by Toby Segaran Chapter 2.
 
 """
-from __future__ import division
+
 from math import sqrt
 import pprint
 # Returns the Pearson correlation coefficient for p1 and p2
@@ -31,7 +31,6 @@ def sim_pearson(prefs, p1, p2):
     si = {}
     for item in prefs[p1]:
         if item in prefs[p2]:
-            print 'ok'
             si[item] = 1
 
     # if they are no ratings in common, return 0
