@@ -134,6 +134,25 @@ def get_suggestions_ratings(_id):
     return _suggestions(user)
 
 
+def get_user_reviews(name):
+    """
+    The function gives the reviews from a user name.
+
+    Args:
+        name (dict): a yelp user in the database
+
+    Return:
+        A dictionary discribing the reviews for a yelp user
+    """
+
+    user = handler.get_documents('users_info', one=True, query={'name': name})
+        
+    ratings = {}
+    for r in user['reviews']:
+        ratings[r['name']] = float(r['rating'])
+    
+    return {user['name']: ratings}
+
 def get_suggestions_username(name):
     """
     The function gives the suggestions from a user name.
@@ -147,14 +166,8 @@ def get_suggestions_username(name):
     Raise:
         An Exception when the user is not in the data base
     """
-    name = name.strip()
-    user = handler.get_documents('users_info', one=True, query={'name': name})
-    
-    ratings = {}
-    for r in user['reviews']:
-        ratings[r['name']] = float(r['rating'])
-    print {user['_id']: ratings}
 
+    user = handler.get_documents('users_info', one=True, query={'name': name})
     
     if not user:
         raise Exception("No user found with the name %s" % (name))

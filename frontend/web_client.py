@@ -118,14 +118,15 @@ def by_user_name(sug_count=15):
     error = None
     suggestions = None
     users = None
+    log = None
 
     if request.method == 'GET':
         users = helper_functions.get_some_user_names()
 
     if request.method == 'POST':
         sug_count = int(sug_count)
-        name = str(request.form['name'])
-
+        name = str(request.form['name']).strip()
+        log = helper_functions.get_reviews(name)
         try:
             suggestions = helper_functions.get_suggestions_username(
                 name)[:sug_count]
@@ -133,7 +134,8 @@ def by_user_name(sug_count=15):
             error = str(e)
 
     return render_template('user.html', name=name, suggestions=suggestions,
-                           error=error, users=users, sug_count=sug_count)
+                           error=error, users=users,log=log,
+                           sug_count=sug_count)
 
 
 if __name__ == '__main__':
