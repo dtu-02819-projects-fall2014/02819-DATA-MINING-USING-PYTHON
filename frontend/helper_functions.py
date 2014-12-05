@@ -149,7 +149,13 @@ def get_suggestions_username(name):
     """
     name = name.strip()
     user = handler.get_documents('users_info', one=True, query={'name': name})
+    
+    ratings = {}
+    for r in user['reviews']:
+        ratings[r['name']] = float(r['rating'])
+    print {user['_id']: ratings}
 
+    
     if not user:
         raise Exception("No user found with the name %s" % (name))
 
