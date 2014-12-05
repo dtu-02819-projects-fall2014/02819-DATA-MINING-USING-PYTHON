@@ -186,6 +186,10 @@ def _suggestions(user):
 
     reco_ids = recommendations.getRecommendations(prefs, user['_id'])
 
+    if not reco_ids:
+        reco_ids = recommendations.getRecommendations(prefs, user['_id'],
+        recommendations.sim_distance)
+        
     suggestions = []
     for score, place_id in reco_ids:
         place = handler.get_documents('places', one=True,
@@ -195,7 +199,7 @@ def _suggestions(user):
 
     if not suggestions:
         raise Exception("No suggestions available")
-
+   
     return suggestions
 
 
